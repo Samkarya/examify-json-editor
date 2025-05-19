@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://Samkarya.github.io/PlugIn/examify-json-editor/",
+  "homepage": "https://Samkarya.github.io/examify-json-editor/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
