@@ -2,7 +2,8 @@ import React from 'react';
 import { useQuestionsStore } from '../../store/questionsStore';
 import { APP_NAME } from '../../constants';
 import { toast } from 'react-toastify';
-import { Upload, Download, CheckCircle, HelpCircle, FileCode } from 'lucide-react';
+import { Upload, Download, CheckCircle, HelpCircle, FileCode, FileText, Code } from 'lucide-react';
+import classNames from 'classnames';
 
 const Toolbar: React.FC = () => {
     const setImportModalOpen = useQuestionsStore((state) => state.setImportModalOpen);
@@ -31,7 +32,23 @@ const Toolbar: React.FC = () => {
                 <div className="bg-primary text-white rounded p-1 me-2 d-flex align-items-center justify-content-center" style={{ width: 28, height: 28 }}>
                     <FileCode size={18} />
                 </div>
-                <span className="fw-bold text-primary">{APP_NAME}</span>
+                <span className="fw-bold text-primary me-4">{APP_NAME}</span>
+
+                {/* View Switcher */}
+                <div className="bg-light rounded p-1 d-flex">
+                    <button
+                        className={classNames("btn btn-sm d-flex align-items-center px-3", { "btn-white shadow-sm fw-bold text-primary": activeMainView === 'form', "text-secondary border-0": activeMainView !== 'form' })}
+                        onClick={() => setActiveMainView('form')}
+                    >
+                        <FileText size={14} className="me-2" /> Form
+                    </button>
+                    <button
+                        className={classNames("btn btn-sm d-flex align-items-center px-3", { "btn-white shadow-sm fw-bold text-primary": activeMainView === 'json', "text-secondary border-0": activeMainView !== 'json' })}
+                        onClick={() => setActiveMainView('json')}
+                    >
+                        <Code size={14} className="me-2" /> JSON
+                    </button>
+                </div>
             </div>
 
             <div className="d-flex align-items-center gap-2">

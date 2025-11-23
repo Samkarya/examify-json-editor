@@ -62,7 +62,7 @@ const JsonEditorView: React.FC = () => {
         </div>
       )}
 
-      <div className="flex-grow-1 overflow-hidden">
+      <div className="flex-grow-1 overflow-auto">
         <CodeMirror
           value={jsonEditorContent}
           height="100%"

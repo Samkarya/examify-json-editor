@@ -2,15 +2,18 @@ import React, { useCallback } from 'react';
 import { useQuestionsStore } from '../../store/questionsStore';
 import QuestionFormFields from './QuestionFormFields';
 import type { Question, OptionMap } from '../../types/Question';
-import { FileQuestion } from 'lucide-react';
+import { FileQuestion, Code } from 'lucide-react';
 
 const FormEditorView: React.FC = () => {
   const currentEditId = useQuestionsStore((state) => state.currentEditId);
-  const getQuestionById = useQuestionsStore((state) => state.getQuestionById);
   const updateQuestion = useQuestionsStore((state) => state.updateQuestion);
-  const addQuestion = useQuestionsStore((state) => state.addQuestion); // For adding options logic if needed, but here we update
+  const addQuestion = useQuestionsStore((state) => state.addQuestion);
+  const setActiveMainView = useQuestionsStore((state) => state.setActiveMainView);
 
-  const question = currentEditId ? getQuestionById(currentEditId) : undefined;
+  // FIX: Subscribe directly to the specific question in the store so updates trigger re-renders
+  const question = useQuestionsStore((state) =>
+    state.questions.find((q) => q.id === state.currentEditId)
+  );
 
   const handleFormChange = useCallback((field: keyof Question | `option_key_${string}` | `option_value_${string}` | `correct_answer_option`, value: any) => {
     if (!currentEditId || !question) return;
@@ -40,7 +43,6 @@ const FormEditorView: React.FC = () => {
       (updatedData as any)[field] = value;
     }
 
-    // Direct update to store (triggers re-render of Preview)
     updateQuestion(currentEditId, updatedData);
   }, [currentEditId, question, updateQuestion]);
 
@@ -79,12 +81,20 @@ const FormEditorView: React.FC = () => {
         </div>
         <h5>No Question Selected</h5>
         <p className="small">Select a question from the Explorer or create a new one.</p>
-        <button
-          className="btn btn-primary btn-sm mt-2"
-          onClick={() => useQuestionsStore.getState().addQuestion({})}
-        >
-          Create New Question
-        </button>
+        <div className="d-flex gap-2 mt-2">
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={() => useQuestionsStore.getState().addQuestion({})}
+          >
+            Create New Question
+          </button>
+          <button
+            className="btn btn-outline-secondary btn-sm d-flex align-items-center"
+            onClick={() => setActiveMainView('json')}
+          >
+            <Code size={14} className="me-2" /> Switch to JSON Mode
+          </button>
+        </div>
       </div>
     );
   }
