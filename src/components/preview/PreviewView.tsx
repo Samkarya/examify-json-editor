@@ -1,82 +1,59 @@
-// src/components/preview/PreviewView.tsx
 import React from 'react';
-import { Card, Button, Alert } from 'react-bootstrap';
 import { useQuestionsStore } from '../../store/questionsStore';
 import QuestionPreviewCard from './QuestionPreviewCard';
-
-// IMPORT THE VALIDATION SERVICE
-import { validateQuestionsData, formatValidationErrors, type ValidationError } from '../../services/validationService';
-import type { Question } from '../../types/Question'; // Import Question type
-
-// MODIFIED: Use the validation service to check data validity
-const checkDataValidityForPreview = (questions: Question[]): string[] | null => {
-    if (!questions || questions.length === 0) {
-        return ["No questions to preview. Load or create questions first."];
-    }
-    const errors: ValidationError[] = validateQuestionsData(questions); // Use the service
-    if (errors.length > 0) {
-        return formatValidationErrors(errors); // Return array of formatted error strings
-    }
-    return null; // No errors
-};
-
+import { validateQuestionsData, formatValidationErrors } from '../../services/validationService';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 const PreviewView: React.FC = () => {
   const questions = useQuestionsStore((state) => state.questions);
-  const [refreshKey, setRefreshKey] = React.useState(0); 
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
   const handleRefreshPreview = () => {
     setRefreshKey(prev => prev + 1);
-    console.log("Preview refreshed (manually triggered)");
   };
-  
-  // validationMessages will be an array of strings or null
-  const validationMessages = checkDataValidityForPreview(questions);
+
+  const errors = validateQuestionsData(questions);
+  const validationMessages = errors.length > 0 ? formatValidationErrors(errors) : null;
 
   return (
-    <Card>
-      <Card.Header className="d-flex justify-content-between align-items-center">
-        <h5 className="mb-0">Live Preview</h5>
-        <Button variant="primary" size="sm" onClick={handleRefreshPreview} title="Refresh the preview">
-          <i className="fa fa-sync-alt me-1"></i> Refresh Preview
-        </Button>
-      </Card.Header>
-      <Card.Body className="preview-render-area">
-        {validationMessages && validationMessages.length > 0 && (
-          <Alert variant="warning" className="preview-validation-errors">
-            <div className="d-flex align-items-center mb-2">
-                <i className="fa fa-exclamation-triangle fa-lg me-2"></i>
-                <strong style={{fontSize: '1.1em'}}>Preview Unvailable or Inaccurate Due to Data Issues:</strong>
-            </div>
-            <ul className="mb-0 ps-4" style={{fontSize: '0.9em'}}>
-              {validationMessages.map((message, index) => (
-                <li key={index}>{message}</li>
-              ))}
-            </ul>
-            <hr />
-            <p className="mb-0 small">
-                Please fix these issues in the Form Editor or JSON Editor and validate the data.
-            </p>
-          </Alert>
-        )}
-        
-        {/* Only render questions if there are no validation messages */}
-        {!validationMessages && questions.length > 0 && (
-          <div key={refreshKey}>
-            {questions.map((question) => (
-              <QuestionPreviewCard key={question.id} question={question} />
-            ))}
+    <div className="h-100 overflow-auto p-4 bg-app">
+      {validationMessages && (
+        <div className="alert alert-warning shadow-sm border-0 mb-4">
+          <div className="d-flex align-items-center mb-2">
+            <AlertTriangle className="me-2 text-warning" />
+            <strong>Validation Issues Detected</strong>
           </div>
-        )}
-        
-        {/* Handle case where there are no questions and no validation errors (initial empty state) */}
-        {!validationMessages && questions.length === 0 && (
-            <Alert variant="info" className="text-center">
-                No questions loaded to preview. Use the Form Editor or Import to add questions.
-            </Alert>
-        )}
-      </Card.Body>
-    </Card>
+          <ul className="mb-0 small ps-3 text-secondary">
+            {validationMessages.slice(0, 3).map((msg, i) => <li key={i}>{msg}</li>)}
+            {validationMessages.length > 3 && <li>...and {validationMessages.length - 3} more.</li>}
+          </ul>
+        </div>
+      )}
+
+      {questions.length === 0 ? (
+        <div className="text-center text-muted mt-5">
+          <p>No questions to preview.</p>
+        </div>
+      ) : (
+        <div key={refreshKey} className="d-flex flex-column gap-4">
+          {questions.map((question) => (
+            <div key={question.id} className="preview-question-card">
+              <QuestionPreviewCard question={question} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Floating Refresh Button (optional, as it updates real-time mostly) */}
+      <button
+        className="btn btn-light shadow-sm position-fixed rounded-circle d-flex align-items-center justify-content-center"
+        style={{ bottom: '50px', right: '30px', width: '40px', height: '40px', zIndex: 100 }}
+        onClick={handleRefreshPreview}
+        title="Force Refresh Preview"
+      >
+        <RefreshCw size={20} className="text-secondary" />
+      </button>
+    </div>
   );
 };
 

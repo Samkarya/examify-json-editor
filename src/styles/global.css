@@ -1,516 +1,189 @@
 /* src/styles/global.css */
-
-/* Import Bootstrap first if you're not importing it in main.tsx/App.tsx directly from node_modules */
-/* @import 'bootstrap/dist/css/bootstrap.min.css'; */
-/* We will import it in main.tsx for better control */
+@import 'bootstrap/dist/css/bootstrap.min.css';
 
 :root {
-    --bs-primary-rgb: 78, 115, 223; /* Example: Matching Bootstrap's default primary */
-    --bs-primary: #4e73df;
-    --primary-color: var(--bs-primary); /* Using Bootstrap's variable if suitable */
-    --secondary-color: #858796;
-    --success-color: #1cc88a;
-    --danger-color: #e74a3b;
-    --warning-color: #f6c23e;
-    --info-color: #36b9cc;
-    --dark-color: #5a5c69;
-    --light-color: #f8f9fc;
-    --font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --font-family-monospace: 'Fira Code', SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    /* --- Color Palette (Apple/One UI Inspired) --- */
+    --bg-app: #f5f5f7;       /* Main background */
+    --bg-panel: #ffffff;     /* Card/Panel background */
+    --bg-sidebar: #fbfbfd;   /* Sidebar background */
+    --bg-input: #f5f5f7;     /* Input fields */
+    
+    --border-color: #d2d2d7; /* Subtle borders */
+    --border-light: #e5e5ea;
+    
+    --primary: #007aff;      /* Apple Blue */
+    --primary-hover: #0062cc;
+    --primary-subtle: rgba(0, 122, 255, 0.1);
+    
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --text-tertiary: #a1a1a6;
+    
+    --danger: #ff3b30;
+    --success: #34c759;
+    --warning: #ffcc00;
+    --info: #5856d6;         /* Apple Purple-ish */
 
-    /* Custom variables from original style.css if not directly replaceable by Bootstrap */
-    --navbar-height: 70px;
+    /* --- Dimensions --- */
+    --header-height: 50px;
+    --status-bar-height: 30px;
     --sidebar-width: 280px;
+    --sidebar-collapsed-width: 60px;
+
+    /* --- Typography --- */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+
+    /* --- Effects --- */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
+    
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 body {
-    background-color: var(--light-color);
-    font-family: var(--font-family-sans-serif);
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
     margin: 0;
     padding: 0;
-    font-size: 1rem;
-    padding-top: var(--navbar-height); /* Account for fixed navbar */
-    overflow-x: hidden; /* Prevent horizontal scrollbars often caused by fixed elements */
+    overflow: hidden; /* App-like feel, no body scroll */
+    height: 100vh;
+    width: 100vw;
 }
 
-/* Navbar styles from prototype */
-.app-navbar { /* Custom class for our Navbar component */
-    background-color: var(--primary-color);
-    padding: 0.75rem 1rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    height: var(--navbar-height);
-    /* Ensure it's fixed if that's the design */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1030; /* Bootstrap's default z-index for fixed navbar */
-}
-
-.app-navbar .navbar-brand {
-    color: white !important;
-    font-weight: bold;
-    font-size: 1.25rem;
-}
-
-.app-navbar .btn-light {
-    background-color: rgba(255,255,255,0.9);
-    border: 1px solid rgba(255,255,255,0.5);
-    color: var(--primary-color);
-}
-.app-navbar .btn-light:hover {
-    background-color: white;
-}
-
-/* Sidebar styles from prototype */
-.app-sidebar {
-    position: fixed;
-    top: var(--navbar-height);
-    bottom: 0;
-    left: 0;
-    z-index: 1020; /* Below navbar */
-    padding: 20px 0 0;
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    width: var(--sidebar-width);
-    background-color: white;
-    overflow-y: auto;
-    transition: margin-left 0.3s ease-in-out;
-}
-
-.app-sidebar.collapsed {
-    margin-left: calc(-1 * var(--sidebar-width));
-}
-
-.sidebar-header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e3e6f0;
-}
-
-.sidebar-content {
-    padding: 1rem 1.5rem;
-}
-
-/* Main content area styles from prototype */
-.main-content-wrapper {
-    margin-left: var(--sidebar-width);
-    padding: 20px;
-    transition: margin-left 0.3s ease-in-out;
-    min-height: calc(100vh - var(--navbar-height)); /* Fill viewport height */
-}
-
-.main-content-wrapper.expanded {
-    margin-left: 0;
-}
-
-/* Sidebar Toggle from prototype */
-.sidebar-toggle-btn {
-    position: fixed;
-    top: calc(var(--navbar-height) + 10px);
-    left: calc(var(--sidebar-width) - 25px); /* Adjust based on button size */
-    z-index: 1021; /* Above sidebar, below navbar dropdowns */
-    background-color: white;
-    border: 1px solid #e3e6f0;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
+/* --- Layout Utilities --- */
+.ide-container {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+
+.ide-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden; /* Prevent scroll leak */
+}
+
+/* --- Resizable Panels --- */
+.PanelGroup {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.ResizeHandleOuter {
+    flex: 0 0 1.5em;
+    position: relative;
+    outline: none;
+    --background-color: transparent;
+    display: flex;
     justify-content: center;
-    cursor: pointer;
-    transition: left 0.3s ease-in-out, transform 0.3s ease-in-out;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.sidebar-toggle-btn:hover {
-    background-color: #f0f0f0;
-}
-
-.sidebar-toggle-btn.collapsed-state { /* When sidebar is collapsed, toggle moves left */
-    left: 15px;
-    /* transform: rotate(180deg); No need if icon changes */
-}
-
-
-/* JSON Editor Container from prototype */
-.json-editor-container-wrapper { /* Renamed to avoid conflict if CodeMirror itself uses .json-editor-container */
-    border: 1px solid #e3e6f0;
-    border-radius: 0.375rem;
-    height: 60vh;
-    overflow: auto;
-}
-/* CodeMirror specific styles might be applied via its theme or wrapper props */
-/* .CodeMirror-lint-tooltip needs high z-index as in original */
-.cm-tooltip-lint { /* For CodeMirror 6 lint tooltips */
-    z-index: 2000 !important;
-}
-
-/* Form Styles from prototype */
-.question-form-card { /* Example custom class if needed for form containers */
-    background-color: white;
-    border-radius: 0.375rem;
-    padding: 1.5rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
-}
-
-/* Options Container in Modal from prototype */
-.options-modal-container .option-row {
-    display: flex;
     align-items: center;
-    margin-bottom: 0.75rem;
-    padding: 0.5rem;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    background-color: #fff;
+    transition: background-color 0.2s;
 }
-.options-modal-container .option-row:last-child {
-    margin-bottom: 0;
-}
-.options-modal-container .option-key-input { /* Specific class for key input */
-    width: 70px;
-    margin-right: 10px;
-    font-family: var(--font-family-monospace);
-}
-.options-modal-container .option-value-textarea { /* Specific class for value textarea */
-    flex-grow: 1;
-}
-.options-modal-container .option-radio-input { /* Specific class for radio */
-    margin-right: 10px;
-    transform: scale(1.1);
+.ResizeHandleOuter:hover {
+    background-color: var(--border-light);
 }
 
+.ResizeHandleInner {
+    position: absolute;
+    top: 0.25em;
+    bottom: 0.25em;
+    left: 0.25em;
+    right: 0.25em;
+    border-radius: 0.25em;
+    background-color: var(--border-color);
+    transition: background-color 0.2s;
+    width: 4px; /* Visible width */
+}
+.ResizeHandleOuter:hover .ResizeHandleInner {
+    background-color: var(--primary);
+}
 
-/* Status Badge from prototype */
-.status-badge {
-    display: inline-block;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.875rem;
+/* --- Common UI Components --- */
+.btn-primary-custom {
+    background-color: var(--primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 1rem;
     font-weight: 500;
-    border-radius: 0.25rem;
-    text-align: center;
-    transition: all 0.3s ease;
+    transition: var(--transition-fast);
 }
-.status-valid {
-    background-color: rgba(var(--bs-success-rgb), 0.1); /* Use Bootstrap success color */
-    color: var(--success-color);
-    border: 1px solid var(--success-color);
-}
-.status-invalid {
-    background-color: rgba(var(--bs-danger-rgb), 0.1); /* Use Bootstrap danger color */
-    color: var(--danger-color);
-    border: 1px solid var(--danger-color);
+.btn-primary-custom:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
-/* Dropzone from prototype */
-.dropzone-area {
-    border: 2px dashed var(--bs-border-color); /* Bootstrap default border color */
-    border-radius: 0.375rem;
-    padding: 2.5rem;
-    text-align: center;
-    background-color: #f8f9fa;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.dropzone-area:hover, .dropzone-area.dragover {
-    background-color: #e9ecef;
-    border-color: var(--primary-color);
-}
-
-/* Error Message Panel from prototype */
-.validation-error-panel {
-    color: var(--danger-color);
-    background-color: rgba(var(--bs-danger-rgb), 0.05);
-    padding: 1rem;
-    border-radius: 0.375rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    white-space: pre-wrap; /* To respect newlines in error messages */
-    border: 1px solid rgba(var(--bs-danger-rgb), 0.2);
-}
-
-/* Help Tooltip Icon from prototype */
-.help-tooltip-icon {
-    cursor: help;
-    color: var(--info-color);
-}
-/* Help Text Below Inputs from prototype */
-.input-help-text {
-    font-size: 0.875rem;
-    color: var(--secondary-color);
-    margin-top: 0.25rem;
-}
-
-/* Preview Container Styles from prototype */
-.preview-render-area {
-    background-color: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    margin-bottom: 20px;
-    font-size: 1rem;
-}
-.preview-question-item {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #e9ecef;
-}
-.preview-question-item:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-.preview-question-header {
+.panel-header {
+    height: var(--header-height);
+    background-color: var(--bg-panel);
+    border-bottom: 1px solid var(--border-light);
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-}
-.preview-question-number {
-    font-weight: bold;
-    color: var(--primary-color);
-    font-size: 1.1em;
-    margin-right: auto; /* Pushes badges to the right */
-}
-.preview-header-details {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-.preview-header-details .badge { /* react-bootstrap Badge will get this */
-    font-size: 0.8em;
-    padding: 0.4em 0.6em;
-}
-.preview-rich-text-content img { /* General style for images within rendered content */
-     max-width: 100%;
-     height: auto;
-     margin: 1rem 0;
-     border-radius: 4px;
-     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.preview-render-area .rendered-image-error {
-    display: inline-block;
-    padding: 10px 15px;
-    border: 1px dashed var(--danger-color);
-    color: var(--danger-color);
-    background-color: rgba(var(--bs-danger-rgb), 0.05);
-    font-size: 0.9em;
-    font-style: italic;
-    border-radius: 4px;
-    margin: 0.5em 0;
-}
-/* KaTeX specific display adjustments */
-.preview-rich-text-content .katex-display > .katex {
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0.5em 0.2em;
-    display: block; /* Ensure it takes full width for scrolling */
-    max-width: 100%;
-    font-size: 1.1em;
-}
-.preview-rich-text-content .katex { /* For inline math */
-    font-size: 1.05em;
-}
-.preview-option-item {
-    margin-bottom: 0.75rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    display: flex;
-    align-items: flex-start; /* Align key and text to top if text wraps */
-    transition: background-color 0.2s ease;
-}
-.preview-option-item:hover {
-    background-color: #f8f9fa;
-}
-.preview-option-item.correct {
-    background-color: rgba(var(--bs-success-rgb), 0.07);
-    border-color: rgba(var(--bs-success-rgb), 0.5);
-}
-.preview-option-item.correct .preview-option-key {
-    color: var(--success-color);
-}
-.preview-option-key {
-    font-weight: bold;
-    margin-right: 0.75rem;
-    width: 30px; /* Adjust as needed */
-    flex-shrink: 0;
-    color: var(--primary-color);
-}
-.preview-option-value {
-    flex-grow: 1;
-    word-wrap: break-word; /* Ensure long option text wraps */
-}
-.preview-explanation-section {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px dashed var(--bs-secondary-bg-subtle); /* Lighter dashed border */
-}
-.preview-explanation-section strong {
-    color: var(--secondary-color);
+    padding: 0 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
 }
 
-
-/* PrismJS Code Block Styling for Markdown Preview (Okaidia theme from CDN) */
-/* We primarily rely on the CDN theme, but can add overrides if needed */
-.preview-rich-text-content pre[class*="language-"] {
-    border-radius: 5px !important;
-    margin: 1em 0 !important;
-    font-size: 0.9rem; /* Slightly smaller font for code blocks */
-    line-height: 1.4;
+.scroll-area {
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-tertiary) transparent;
 }
-/* Inline code styling for Markdown preview */
-.preview-rich-text-content :not(pre) > code {
-    font-family: var(--font-family-monospace);
-    background-color: rgba(27,31,35,.07);
-    color: var(--bs-code-color); /* Use Bootstrap's code color */
-    padding: .2em .4em;
-    margin: 0;
-    font-size: 85%;
+.scroll-area::-webkit-scrollbar {
+    width: 6px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+    background-color: var(--text-tertiary);
     border-radius: 3px;
 }
 
-/* Tab Styles (Main Tabs) - react-bootstrap Nav often handles this well */
-.main-tabs .nav-link {
-    color: var(--secondary-color);
-    border-top-left-radius: .375rem;
-    border-top-right-radius: .375rem;
-    padding: 0.75rem 1.25rem;
-    font-weight: 500;
+/* --- Preview Styles (Ported & Refined) --- */
+.preview-content {
+    padding: 2rem;
+    background: white;
+    min-height: 100%;
 }
-.main-tabs .nav-link.active {
-    color: var(--primary-color);
-    background-color: #fff;
-    border-color: #dee2e6 #dee2e6 #fff;
-    border-bottom: 2px solid var(--primary-color) !important;
+.preview-question-card {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
 }
-
-/* JSON Templates (Sidebar) */
-.json-templates-list {
-    max-height: calc(100vh - 300px); /* Adjust based on surrounding elements */
-    overflow-y: auto;
-    padding-right: 5px;
-}
-.template-btn-item { /* For individual template buttons */
-    text-align: left;
-    margin-bottom: 0.5rem;
-    width: 100%;
-    font-size: 0.9rem;
-    padding: 0.5rem 0.75rem;
-    /* Uses react-bootstrap Button variants primarily */
-}
-.template-btn-item i.fas { /* If using <i> for icons within buttons */
-    margin-right: 0.75rem;
-    width: 16px;
-    text-align: center;
-}
-.spinner-container { /* For loading spinners */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100px;
+.preview-question-number {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: block;
 }
 
-/* Required Field Indicator */
-.required-field-label::after {
-    content: " *";
-    color: var(--danger-color);
+/* --- CodeMirror Overrides --- */
+.cm-editor {
+    height: 100%;
+    font-family: var(--font-mono);
+}
+.cm-scroller {
+    font-family: var(--font-mono);
 }
 
-/* Footer Styles */
-.app-footer {
-    margin-top: 2.5rem;
-    padding: 1.5rem 0;
-    text-align: center;
-    font-size: 0.875rem;
-    color: var(--secondary-color);
-    border-top: 1px solid #e3e6f0;
+/* --- Toastify Override --- */
+.Toastify__toast {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-sans);
 }
 
-/* Tooltip (react-bootstrap OverlayTrigger will handle this mostly) */
-/* .tooltip-inner is styled by Bootstrap */
-
-/* KaTeX container for horizontal scrolling */
-.katex-render-container {
-    overflow-x: auto; /* Allow horizontal scroll for very wide equations */
-    padding: 2px; /* Small padding so scrollbar doesn't cut content */
-}
-
-
-/* Accordion customisations if react-bootstrap defaults aren't enough */
-.form-question-accordion .accordion-button:not(.collapsed) {
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
-    color: var(--primary-color);
-}
-
-/* Code Block in Help Modal */
-.help-code-block {
-    background-color: #2d2d2d;
-    color: #f8f8f2;
-    padding: 1rem;
-    border-radius: 5px;
-    margin: 1rem 0;
-    font-family: var(--font-family-monospace);
-    font-size: 0.875em;
-    overflow-x: auto;
-    border: 1px solid #44475a;
-}
-.help-code-block code { /* Reset for code inside our custom block */
-    background-color: transparent !important;
-    padding: 0 !important;
-    color: inherit !important;
-    font-family: inherit !important;
-    font-size: inherit !important;
-}
-
-/* Help Modal Specifics */
-.help-modal-sticky-nav { /* For the side navigation in help */
-    position: sticky;
-    top: 20px;
-}
-
-
-/* Ensure Toastify is above modals */
-.Toastify__toast-container {
-  z-index: 99999 !important;
-}
-
-
-/* Responsive adjustments from prototype */
-@media (max-width: 768px) {
-    .app-sidebar {
-        margin-left: calc(-1 * var(--sidebar-width)); /* Hidden by default */
-    }
-    .app-sidebar.collapsed { /* Actually means sidebar is SHOWN on mobile, bad naming from original */
-        margin-left: 0;
-    }
-    .main-content-wrapper {
-        margin-left: 0;
-        padding: 15px;
-    }
-    /* When sidebar is not collapsed (i.e. shown on mobile after toggle) */
-    .app-sidebar:not(.collapsed) + .main-content-wrapper {
-       /* No margin push on mobile, sidebar overlays or user handles scroll */
-    }
-
-    .sidebar-toggle-btn {
-        top: calc(var(--navbar-height) + 10px);
-        left: 15px; /* Default to near edge for collapsed state */
-    }
-    .app-sidebar:not(.collapsed) ~ .sidebar-toggle-btn {
-        left: calc(var(--sidebar-width) - 25px);
-         /* transform: rotate(180deg); No need if icon changes */
-    }
-
-    .app-navbar .navbar-brand { font-size: 1.1rem; }
-    .app-navbar .btn-sm { font-size: 0.8rem; padding: 0.2rem 0.4rem;}
-    .json-editor-container-wrapper { height: calc(100vh - 200px); } /* More space for content on mobile */
-}
-
-/* Ensure modals are above other fixed elements if necessary, Bootstrap usually handles this */
-.modal {
-    z-index: 1050; /* Default Bootstrap modal z-index */
-}
-.modal-backdrop {
-    z-index: 1040; /* Default Bootstrap backdrop z-index */
-}
+/* --- Utility Classes --- */
+.text-subtle { color: var(--text-secondary); }
+.bg-subtle { background-color: var(--bg-app); }
