@@ -3,10 +3,22 @@ import { useQuestionsStore } from '../../store/questionsStore';
 import QuestionPreviewCard from './QuestionPreviewCard';
 import { validateQuestionsData, formatValidationErrors } from '../../services/validationService';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import classNames from 'classnames';
 
 const PreviewView: React.FC = () => {
   const questions = useQuestionsStore((state) => state.questions);
+  const currentEditId = useQuestionsStore((state) => state.currentEditId);
   const [refreshKey, setRefreshKey] = React.useState(0);
+
+  // Scroll Sync Effect
+  React.useEffect(() => {
+    if (currentEditId) {
+      const element = document.getElementById(`question-preview-${currentEditId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [currentEditId]);
 
   const handleRefreshPreview = () => {
     setRefreshKey(prev => prev + 1);
@@ -37,14 +49,24 @@ const PreviewView: React.FC = () => {
       ) : (
         <div key={refreshKey} className="d-flex flex-column gap-4">
           {questions.map((question) => (
-            <div key={question.id} className="preview-question-card">
+            <div
+              key={question.id}
+              id={`question-preview-${question.id}`}
+              className={classNames("preview-question-card transition-all duration-300", {
+                "ring-2 ring-primary ring-offset-2 rounded border-primary": currentEditId === question.id
+              })}
+              style={{
+                border: currentEditId === question.id ? '2px solid var(--primary)' : '1px solid transparent',
+                borderRadius: '8px'
+              }}
+            >
               <QuestionPreviewCard question={question} />
             </div>
           ))}
         </div>
       )}
 
-      {/* Floating Refresh Button (optional, as it updates real-time mostly) */}
+      {/* Floating Refresh Button */}
       <button
         className="btn btn-light shadow-sm position-fixed rounded-circle d-flex align-items-center justify-content-center"
         style={{ bottom: '50px', right: '30px', width: '40px', height: '40px', zIndex: 100 }}

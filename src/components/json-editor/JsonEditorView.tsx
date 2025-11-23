@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
+import React, { useState, useRef, useEffect } from 'react';
+import CodeMirror, { type ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { json as jsonLang, jsonParseLinter } from '@codemirror/lang-json';
 import { linter } from "@codemirror/lint";
 import { dracula } from '@uiw/codemirror-theme-dracula';
@@ -7,14 +7,41 @@ import { useQuestionsStore } from '../../store/questionsStore';
 import { toast } from 'react-toastify';
 import { validateRawJsonString, formatValidationErrors } from '../../services/validationService';
 import { CheckCircle, RefreshCw } from 'lucide-react';
+import { EditorView } from '@codemirror/view';
 
 const JsonEditorView: React.FC = () => {
+  const questions = useQuestionsStore((state) => state.questions);
+  const currentEditId = useQuestionsStore((state) => state.currentEditId);
   const jsonEditorContent = useQuestionsStore((state) => state.jsonEditorContent);
   const setJsonEditorContent = useQuestionsStore((state) => state.setJsonEditorContent);
   const setLoading = useQuestionsStore((state) => state.setLoading);
   const updateStateFromJsonEditor = useQuestionsStore((state) => state.updateStateFromJsonEditorContent);
 
   const [editorStatus, setEditorStatus] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
+  const viewRef = useRef<ReactCodeMirrorRef>(null);
+
+  // Scroll Sync Effect for JSON Editor
+  useEffect(() => {
+    if (currentEditId && viewRef.current && viewRef.current.view) {
+      const question = questions.find(q => q.id === currentEditId);
+      if (question) {
+        // Find the approximate location of this question in the JSON string
+        // We look for "question_number": X
+        const searchString = `"question_number": ${question.question_number}`;
+        const index = jsonEditorContent.indexOf(searchString);
+
+        if (index !== -1) {
+          // Create a transaction to scroll to this position
+          const view = viewRef.current.view;
+          const transaction = view.state.update({
+            effects: EditorView.scrollIntoView(index, { y: 'center' }),
+            selection: { anchor: index }
+          });
+          view.dispatch(transaction);
+        }
+      }
+    }
+  }, [currentEditId, questions]); // Removed jsonEditorContent from deps to avoid jumping while typing
 
   const handleEditorChange = React.useCallback((value: string) => {
     setJsonEditorContent(value);
@@ -64,6 +91,7 @@ const JsonEditorView: React.FC = () => {
 
       <div className="flex-grow-1 overflow-auto">
         <CodeMirror
+          ref={viewRef}
           value={jsonEditorContent}
           height="100%"
           extensions={[jsonLang(), linter(jsonParseLinter() as any)]}
