@@ -19,9 +19,9 @@ const QuestionPreviewCard: React.FC<QuestionPreviewCardProps> = ({ question }) =
           {question.section_id && <Badge bg="primary-subtle" text="primary-emphasis" className="me-1">{question.section_id}</Badge>}
           {question.difficulty ? (
             <Badge bg="warning-subtle" text="warning-emphasis">{question.difficulty}</Badge>
-           ) : (
+          ) : (
             <Badge bg="light" text="muted">Difficulty: N/A</Badge>
-           )}
+          )}
         </div>
       </div>
 
@@ -37,7 +37,7 @@ const QuestionPreviewCard: React.FC<QuestionPreviewCardProps> = ({ question }) =
                 key={key}
                 className={`preview-option-item ${isCorrect ? 'correct' : ''}`}
               >
-                <span className="preview-option-key">{key.toUpperCase()})</span>
+                <span className="preview-option-key">{key.toUpperCase()}</span>
                 <div className="preview-option-value">
                   <RichTextRenderer rawText={value} />
                 </div>
