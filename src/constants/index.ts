@@ -193,7 +193,8 @@ export const INITIAL_QUESTION_DATA_EXAMPLE: Partial<Question>[] = [
     subject: "Geography",
     topic: "Capitals",
     difficulty: "Easy",
-    explanation: "Paris is the capital and most populous city of France."
+    explanation: "Paris is the capital and most populous city of France.",
+    section_id: null,
   }
 ];
 

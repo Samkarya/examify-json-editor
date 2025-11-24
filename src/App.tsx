@@ -1,4 +1,3 @@
-import React from 'react';
 import IDEContainer from './components/layout/IDEContainer';
 import Sidebar from './components/layout/Sidebar';
 import Toolbar from './components/layout/Toolbar';
