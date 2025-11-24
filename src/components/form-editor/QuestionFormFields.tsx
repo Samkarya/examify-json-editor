@@ -1,10 +1,10 @@
-// src/components/form-editor/QuestionFormFields.tsx
 import React, { type ChangeEvent, useEffect, useRef } from 'react';
 import { Form, Row, Col, InputGroup, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import type { Question, OptionMap } from '../../types/Question';
+import { Info, Plus, Trash2, X } from 'lucide-react';
 
 interface QuestionFormFieldsProps {
-  formData: Partial<Question>; // Using Partial as it's for both new (empty) and existing questions
+  formData: Partial<Question>;
   onFormChange: (field: keyof Question | `option_key_${string}` | `option_value_${string}` | `correct_answer_option`, value: any) => void;
   onAddOption: () => void;
   onRemoveOption: (optionKey: string) => void;
@@ -22,7 +22,6 @@ const QuestionFormFields: React.FC<QuestionFormFieldsProps> = ({
   onFormChange,
   onAddOption,
   onRemoveOption,
-  isEditing,
 }) => {
   const {
     question_number,
@@ -31,7 +30,7 @@ const QuestionFormFields: React.FC<QuestionFormFieldsProps> = ({
     topic,
     section_id,
     question_text,
-    options = { a: '', b: ''}, // Default to ensure options is always an object
+    options = { a: '', b: '' },
     correct_answer,
     explanation,
   } = formData;
@@ -40,7 +39,7 @@ const QuestionFormFields: React.FC<QuestionFormFieldsProps> = ({
     const { name, value, type } = e.target;
     let processedValue: any = value;
     if (type === 'number') {
-      processedValue = value === '' ? '' : Number(value); // Allow empty string for clearing
+      processedValue = value === '' ? '' : Number(value);
     }
     onFormChange(name as keyof Question, processedValue);
   };
@@ -52,48 +51,42 @@ const QuestionFormFields: React.FC<QuestionFormFieldsProps> = ({
   const handleOptionValueChange = (key: string, value: string) => {
     onFormChange(`option_value_${key}` as any, value);
   };
-  
+
   const questionTextareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (questionTextareaRef.current) {
-        questionTextareaRef.current.style.height = 'auto';
-        questionTextareaRef.current.style.height = `${questionTextareaRef.current.scrollHeight}px`;
+      questionTextareaRef.current.style.height = 'auto';
+      questionTextareaRef.current.style.height = `${questionTextareaRef.current.scrollHeight}px`;
     }
   }, [question_text]);
 
-
   return (
-    <Form id="questionFormInternal"> {/* Added id for potential form reset outside React */}
+    <Form className="p-3">
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group controlId="questionNumber">
-            <Form.Label className="required-field-label">Question Number</Form.Label>
-            <InputGroup>
+            <Form.Label className="small fw-bold text-secondary">Question #</Form.Label>
+            <InputGroup size="sm">
               <Form.Control
                 type="number"
                 name="question_number"
                 value={question_number || ''}
                 onChange={handleInputChange}
                 min="1"
-                required
-                isInvalid={!question_number || question_number <= 0}
+                className="bg-input border-0"
               />
-              <HelpTooltip message="Must be a positive integer. Should be sequential (auto-suggested for new questions) and unique.">
-                <InputGroup.Text><i className="fa fa-info-circle help-tooltip-icon"></i></InputGroup.Text>
-              </HelpTooltip>
             </InputGroup>
-            <Form.Control.Feedback type="invalid">
-                Please provide a valid, positive question number.
-            </Form.Control.Feedback>
           </Form.Group>
         </Col>
         <Col md={6}>
           <Form.Group controlId="difficulty">
-            <Form.Label>Difficulty</Form.Label>
+            <Form.Label className="small fw-bold text-secondary">Difficulty</Form.Label>
             <Form.Select
               name="difficulty"
               value={difficulty || ''}
               onChange={handleInputChange}
+              size="sm"
+              className="bg-input border-0"
             >
               <option value="">Not specified</option>
               <option value="Easy">Easy</option>
@@ -107,142 +100,121 @@ const QuestionFormFields: React.FC<QuestionFormFieldsProps> = ({
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group controlId="subject">
-            <Form.Label>Subject</Form.Label>
+            <Form.Label className="small fw-bold text-secondary">Subject</Form.Label>
             <Form.Control
               type="text"
               name="subject"
-              placeholder="e.g., Mathematics"
+              placeholder="Mathematics"
               value={subject || ''}
               onChange={handleInputChange}
+              size="sm"
+              className="bg-input border-0"
             />
           </Form.Group>
         </Col>
         <Col md={6}>
           <Form.Group controlId="topic">
-            <Form.Label>Topic</Form.Label>
+            <Form.Label className="small fw-bold text-secondary">Topic</Form.Label>
             <Form.Control
               type="text"
               name="topic"
-              placeholder="e.g., Calculus"
+              placeholder="Calculus"
               value={topic || ''}
               onChange={handleInputChange}
+              size="sm"
+              className="bg-input border-0"
             />
           </Form.Group>
         </Col>
       </Row>
 
-      <Form.Group className="mb-3" controlId="sectionId">
-        <Form.Label>Section ID</Form.Label>
+      <Form.Group className="mb-4" controlId="questionText">
+        <div className="d-flex justify-content-between align-items-center mb-1">
+          <Form.Label className="small fw-bold text-secondary mb-0">Question Text</Form.Label>
+          <HelpTooltip message="Supports LaTeX ($...$), Markdown, and Code Blocks.">
+            <Info size={14} className="text-muted cursor-pointer" />
+          </HelpTooltip>
+        </div>
         <Form.Control
-          type="text"
-          name="section_id"
-          placeholder="e.g., Section A, Quant"
-          value={section_id || ''}
+          as="textarea"
+          name="question_text"
+          rows={4}
+          value={question_text || ''}
           onChange={handleInputChange}
+          ref={questionTextareaRef}
+          className="bg-input border-0 font-monospace"
+          style={{ minHeight: '100px', fontSize: '0.9rem' }}
         />
       </Form.Group>
 
-      <Form.Group className="mb-3" controlId="questionText">
-        <Form.Label className="required-field-label">Question Text</Form.Label>
-        <InputGroup>
-            <Form.Control
-                as="textarea"
-                name="question_text"
-                rows={3} // Initial rows, will auto-expand
-                value={question_text || ''}
-                onChange={handleInputChange}
-                required
-                isInvalid={!question_text || question_text.trim() === ''}
-                ref={questionTextareaRef}
-                style={{overflowY: 'hidden'}} // To prevent scrollbar during auto-height
-            />
-            <HelpTooltip message="Supports LaTeX (e.g., $\alpha$), Markdown images (![alt](url or path like 'ExamName/assets/image.png')), and code blocks (```lang ... ```).">
-                <InputGroup.Text className="align-items-start pt-2"><i className="fa fa-info-circle help-tooltip-icon"></i></InputGroup.Text>
-            </HelpTooltip>
-        </InputGroup>
-         <Form.Control.Feedback type="invalid">
-            Question text cannot be empty.
-        </Form.Control.Feedback>
-        <div className="input-help-text small mt-1">
-          <strong>Format Tips:</strong> Inline math: <code>$...$</code>, Display math: <code>$$...$$</code>. Images: <code>![Alt](URL)</code> or <code>![Alt](RelativePath/image.png)</code>. Code: <code>```language ... ```</code>
+      <div className="mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <Form.Label className="small fw-bold text-secondary mb-0">Options</Form.Label>
+          <Button variant="link" size="sm" className="p-0 text-primary text-decoration-none" onClick={onAddOption}>
+            <Plus size={14} className="me-1" /> Add Option
+          </Button>
         </div>
-      </Form.Group>
 
-      <div className="mb-3">
-        <Form.Label className="required-field-label">Options</Form.Label>
-        <span className="input-help-text ms-2">(Minimum 2 options required)</span>
-        <div className="options-modal-container mt-2"> {/* Class from global.css */}
+        <div className="d-flex flex-column gap-2">
           {Object.entries(options).map(([key, value]) => (
-            <Row key={key} className="option-row mb-2 gx-2 align-items-center"> {/* gx-2 for gutter */}
-              <Col xs="auto" className="d-flex align-items-center">
+            <div key={key} className="d-flex align-items-start gap-2 bg-white p-2 rounded border border-light shadow-sm">
+              <div className="pt-1">
                 <Form.Check
                   type="radio"
                   name="correct_answer_option"
-                  id={`correct_answer_${key}`}
-                  value={key}
                   checked={correct_answer === key}
                   onChange={() => onFormChange('correct_answer', key)}
-                  className="option-radio-input me-1" 
-                  aria-label={`Mark option ${key} as correct`}
+                  title="Mark as correct"
                 />
-              </Col>
-              <Col style={{maxWidth: '100px'}}>
+              </div>
+              <div style={{ width: '60px' }}>
                 <Form.Control
                   type="text"
-                  className="option-key-input"
                   value={key}
                   onChange={(e) => handleOptionKeyChange(key, e.target.value)}
                   placeholder="Key"
                   size="sm"
-                  required
-                  isInvalid={!key || key.trim() === ''}
+                  className="text-center fw-bold border-0 bg-light"
                 />
-              </Col>
-              <Col>
+              </div>
+              <div className="flex-grow-1">
                 <Form.Control
                   as="textarea"
-                  rows={1} // Will auto-expand slightly
-                  className="option-value-textarea"
+                  rows={1}
                   value={value}
                   onChange={(e) => handleOptionValueChange(key, e.target.value)}
-                  placeholder="Option text (supports rich content)"
+                  placeholder="Option text..."
                   size="sm"
-                  required
-                  isInvalid={!value || value.trim() === ''}
+                  className="border-0 p-0"
+                  style={{ resize: 'none', boxShadow: 'none' }}
                 />
-              </Col>
-              <Col xs="auto">
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={() => onRemoveOption(key)}
-                  disabled={Object.keys(options).length <= 2}
-                  title="Remove this option"
-                >
-                  <i className="fa fa-times"></i>
-                </Button>
-              </Col>
-            </Row>
+              </div>
+              <Button
+                variant="link"
+                size="sm"
+                className="text-danger p-0 opacity-50 hover-opacity-100"
+                onClick={() => onRemoveOption(key)}
+                disabled={Object.keys(options).length <= 2}
+              >
+                <X size={16} />
+              </Button>
+            </div>
           ))}
         </div>
-        <Button variant="outline-primary" size="sm" onClick={onAddOption} className="mt-1">
-          <i className="fa fa-plus me-1"></i> Add Option
-        </Button>
       </div>
 
       <Form.Group className="mb-3" controlId="explanation">
-        <Form.Label>Explanation</Form.Label>
+        <Form.Label className="small fw-bold text-secondary">Explanation</Form.Label>
         <Form.Control
           as="textarea"
           name="explanation"
           rows={3}
-          placeholder="Provide detailed explanation (recommended). Supports same formatting as question text."
+          placeholder="Explain the answer..."
           value={explanation || ''}
           onChange={handleInputChange}
+          className="bg-input border-0"
+          style={{ fontSize: '0.9rem' }}
         />
-        <div className="input-help-text small mt-1">
-          (Highly Recommended) Add a detailed explanation. Supports the same rich content.
-        </div>
       </Form.Group>
     </Form>
   );

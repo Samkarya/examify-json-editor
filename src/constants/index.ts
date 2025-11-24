@@ -64,7 +64,7 @@ export const TEMPLATES: TemplatesByCategory = {
             'To solve for \\( x \\):\n1. Subtract 3 from both sides: \\( 2x + 3 - 3 = 7 - 3 \\Rightarrow 2x = 4 \\).\n2. Divide by 2: \\( x = \\frac{4}{2} \\Rightarrow x = 2 \\).',
         },
       ],
-    },  
+    },
     {
       name: 'Physics (Optics)',
       icon: 'fa-lightbulb',
@@ -144,7 +144,7 @@ export const TEMPLATES: TemplatesByCategory = {
           difficulty: 'Easy',
           section_id: 'Visuals',
           question_text:
-            "The following diagram shows a basic electric circuit. Identify component 'X'.\n\n![Circuit Diagram Example](assets/placeholder_circuit.png)",
+            "The following diagram shows a basic electric circuit. Identify component 'X'.\n\n![Circuit Diagram Example](https://media.geeksforgeeks.org/wp-content/uploads/20230227144647/Electric-Circuit-1.png)",
           options: {
             a: 'Resistor',
             b: 'Capacitor',
@@ -153,7 +153,7 @@ export const TEMPLATES: TemplatesByCategory = {
           },
           correct_answer: 'd',
           explanation:
-            "Component 'X' in a typical simple circuit diagram could be a switch. (Note: `assets/placeholder_circuit.png` should exist in the GitHub repo for this to render).",
+            "Component 'X' in a typical simple circuit diagram could be a switch. (Note: `assets/placeholder_circuit.png` should exist in the GitHub repo for this to render or u can use third party images).",
         },
       ],
     },
@@ -193,7 +193,8 @@ export const INITIAL_QUESTION_DATA_EXAMPLE: Partial<Question>[] = [
     subject: "Geography",
     topic: "Capitals",
     difficulty: "Easy",
-    explanation: "Paris is the capital and most populous city of France."
+    explanation: "Paris is the capital and most populous city of France.",
+    section_id: null,
   }
 ];
 
