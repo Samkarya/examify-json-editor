@@ -21,7 +21,7 @@ const Toolbar: React.FC = () => {
     const handlePrint = (showAnswers: boolean) => {
         localStorage.setItem('examify-print-data', JSON.stringify(questions));
         localStorage.setItem('examify-print-title', exportFileName.replace('.json', ''));
-        window.open(`/?mode=print&showAnswers=${showAnswers}`, '_blank');
+        window.open(`https://samkarya.github.io/examify-json-editor/?mode=print&showAnswers=${showAnswers}`, '_blank');
     };
 
     const handleValidateGlobalClick = () => {
