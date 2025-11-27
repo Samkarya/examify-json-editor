@@ -29,6 +29,7 @@ This project is an evolution of an earlier vanilla HTML, CSS, and JavaScript ver
 *   **Rich Text Support:** Question text, options, and explanations support rich content formatting.
 *   **Responsive Design:** Adapts to different screen sizes for use on desktops, tablets, and mobile devices.
 *   **Client-Side State Management:** Uses Zustand for efficient and predictable state management.
+*   **Resizable Layout:** Customizable workspace with resizable panels for Form Editor, JSON Editor, and Preview.
 *   **Modern Tech Stack:** Built with React, TypeScript, Vite, and Bootstrap.
 
 ## Tech Stack
@@ -38,6 +39,9 @@ This project is an evolution of an earlier vanilla HTML, CSS, and JavaScript ver
 *   **Build Tool:** [Vite](https://vitejs.dev/)
 *   **State Management:** [Zustand](https://zustand-demo.pmnd.rs/)
 *   **UI Components:** [React-Bootstrap](https://react-bootstrap.github.io/)
+*   **Icons:** [Lucide React](https://lucide.dev/)
+*   **Animations:** [Framer Motion](https://www.framer.com/motion/)
+*   **Layout:** [React Resizable Panels](https://github.com/bvaughn/react-resizable-panels)
 *   **JSON Editor:** [CodeMirror 6](https://codemirror.net/) (via `@uiw/react-codemirror`)
 *   **Markdown Parsing:** [Marked.js](https://marked.js.org/)
 *   **HTML Sanitization:** [DOMPurify](https://github.com/cure53/DOMPurify)
