@@ -11,7 +11,17 @@ import ExportModal from './components/modals/ExportModal';
 import HelpModal from './components/modals/HelpModal';
 import LoadingModal from './components/common/LoadingModal';
 
+// Print View
+import PrintView from './components/print/PrintView';
+
 function App() {
+  // Check for print mode
+  const isPrintMode = new URLSearchParams(window.location.search).get('mode') === 'print';
+
+  if (isPrintMode) {
+    return <PrintView />;
+  }
+
   return (
     <IDEContainer>
       <div className="d-flex flex-grow-1 overflow-hidden">

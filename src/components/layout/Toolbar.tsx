@@ -2,7 +2,8 @@ import React from 'react';
 import { useQuestionsStore } from '../../store/questionsStore';
 import { APP_NAME } from '../../constants';
 import { toast } from 'react-toastify';
-import { Upload, Download, CheckCircle, HelpCircle, FileCode, FileText, Code } from 'lucide-react';
+import { Dropdown } from 'react-bootstrap';
+import { Upload, Download, CheckCircle, HelpCircle, FileCode, FileText, Code, Printer } from 'lucide-react';
 import classNames from 'classnames';
 
 const Toolbar: React.FC = () => {
@@ -13,6 +14,15 @@ const Toolbar: React.FC = () => {
     const setActiveMainView = useQuestionsStore(state => state.setActiveMainView);
     const triggerFormValidationStore = useQuestionsStore((state) => state.triggerFormValidation);
     const triggerJsonEditorValidationStore = useQuestionsStore((state) => state.triggerJsonEditorValidation);
+
+    const questions = useQuestionsStore((state) => state.questions);
+    const exportFileName = useQuestionsStore((state) => state.exportFileName);
+
+    const handlePrint = (showAnswers: boolean) => {
+        localStorage.setItem('examify-print-data', JSON.stringify(questions));
+        localStorage.setItem('examify-print-title', exportFileName.replace('.json', ''));
+        window.open(`/?mode=print&showAnswers=${showAnswers}`, '_blank');
+    };
 
     const handleValidateGlobalClick = () => {
         if (activeMainView === 'form') {
@@ -58,6 +68,18 @@ const Toolbar: React.FC = () => {
                 <button className="btn btn-sm btn-light border d-flex align-items-center" onClick={() => setExportModalOpen(true)}>
                     <Download size={14} className="me-2" /> Export
                 </button>
+
+                <Dropdown>
+                    <Dropdown.Toggle variant="light" size="sm" className="border d-flex align-items-center">
+                        <Printer size={14} className="me-2" /> PDF
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => handlePrint(true)}>With Answers & Explanations</Dropdown.Item>
+                        <Dropdown.Item onClick={() => handlePrint(false)}>Practice Mode (No Answers)</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+
                 <div className="vr mx-1"></div>
                 <button className="btn btn-sm btn-primary-custom text-white d-flex align-items-center" onClick={handleValidateGlobalClick}>
                     <CheckCircle size={14} className="me-2" /> Validate

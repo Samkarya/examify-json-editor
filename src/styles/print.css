@@ -1,0 +1,256 @@
+/* src/styles/print.css */
+/* Container Reset */
+.print-container {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Header Styling */
+.print-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #0d6efd;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.print-logo {
+    height: 50px;
+    width: auto;
+}
+
+.print-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0d6efd;
+    margin: 0;
+}
+
+.print-meta,
+.print-footer div a {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: right;
+}
+
+/* Question Card Styling */
+.question-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #e9ecef !important;
+    border-radius: 8px !important;
+    margin-bottom: 20px !important;
+    padding: 20px !important;
+    background-color: #fff !important;
+    box-shadow: none !important;
+}
+
+.question-number {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0d6efd;
+    min-width: 40px;
+}
+
+.question-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #212529;
+}
+
+.question-text img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Options Styling */
+.option-item {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.option-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-right: 10px;
+    min-width: 30px;
+    text-align: center;
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+/* Answer Section */
+.answer-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #dee2e6;
+    background-color: #f8f9fa !important;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.correct-answer {
+    color: #198754 !important;
+    font-weight: 700;
+}
+
+/* Footer Styling */
+.print-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 10px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #adb5bd;
+    background-color: #fff;
+}
+
+@media print {
+    @page {
+        margin: 5mm 5mm 5mm 5mm;
+        size: A4;
+    }
+
+    body {
+        background-color: #fff !important;
+        color: #1a1a1a !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Hide non-print elements just in case */
+    .no-print {
+        display: none !important;
+    }
+
+    /* Container Reset */
+    .print-container {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Header Styling */
+    .print-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+
+    .print-logo {
+        height: 50px;
+        width: auto;
+    }
+
+    .print-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0d6efd;
+        margin: 0;
+    }
+
+    .print-meta {
+        font-size: 12px;
+        color: #6c757d;
+        text-align: right;
+    }
+
+    /* Question Card Styling */
+    .question-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #e9ecef !important;
+        border-radius: 8px !important;
+        margin-bottom: 20px !important;
+        padding: 20px !important;
+        background-color: #fff !important;
+        box-shadow: none !important;
+    }
+
+    .question-number {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0d6efd;
+        min-width: 40px;
+    }
+
+    .question-text {
+        font-size: 15px;
+        line-height: 1.5;
+        color: #212529;
+    }
+
+    .question-text img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Options Styling */
+    .option-item {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .option-badge {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-right: 10px;
+        min-width: 30px;
+        text-align: center;
+        background-color: #f8f9fa !important;
+        color: #495057 !important;
+    }
+
+    /* Answer Section */
+    .answer-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #dee2e6;
+        background-color: #f8f9fa !important;
+        padding: 15px;
+        border-radius: 6px;
+    }
+
+    .correct-answer {
+        color: #198754 !important;
+        font-weight: 700;
+    }
+
+    /* Footer Styling */
+    .print-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding-top: 10px;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #adb5bd;
+        background-color: #fff;
+    }
+
+    /* Page Numbers */
+    /* Note: Browser support for page numbers in content is limited, typically handled by browser print settings */
+}
