@@ -132,7 +132,7 @@ const ImportModal: React.FC = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       // Ensure the message is from the expected origin
-      if (event.origin === ('https://examify.web.app')) {
+      if (event.origin === ('https://examoven.com') || event.origin === ('https://www.examoven.com') || event.origin === ('https://examify.web.app')) {
         const { type, payload } = event.data;
         if (type === 'loadExamJson' && typeof payload === 'string') {
           try {

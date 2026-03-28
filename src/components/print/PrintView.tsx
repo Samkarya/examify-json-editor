@@ -7,7 +7,7 @@ const PrintView: React.FC = () => {
     const [showAnswers, setShowAnswers] = useState(false);
     const [examTitle, setExamTitle] = useState('Exam');
     const [branding] = useState({
-        logoUrl: 'https://examify.web.app/web-app-manifest-512x512.png',
+        logoUrl: 'https://examoven.com/web-app-manifest-512x512.png',
         primaryColor: '#0d6efd'
     });
 
@@ -53,7 +53,7 @@ const PrintView: React.FC = () => {
             {/* Header */}
             <div className="print-header">
                 <div className="d-flex align-items-center">
-                    <a href="https://examify.web.app" target="_blank" rel="noopener noreferrer" className="text-decoration-none text-dark d-flex align-items-center">
+                    <a href="https://examoven.com" target="_blank" rel="noopener noreferrer" className="text-decoration-none text-dark d-flex align-items-center">
                         <img src={branding.logoUrl} alt="Logo" className="print-logo me-3" />
                         <div>
                             <h1 className="print-title">{examTitle}</h1>
@@ -109,7 +109,7 @@ const PrintView: React.FC = () => {
             <div className="print-footer">
                 <div>{examTitle}</div>
                 <div>
-                    <a href="https://examify.web.app" target="_blank" rel="noopener noreferrer">
+                    <a href="https://examoven.com" target="_blank" rel="noopener noreferrer">
                         Examify - The Ultimate Exam Preparation Tool
                     </a>
                 </div>
