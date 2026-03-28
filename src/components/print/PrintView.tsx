@@ -110,7 +110,7 @@ const PrintView: React.FC = () => {
                 <div>{examTitle}</div>
                 <div>
                     <a href="https://examoven.com" target="_blank" rel="noopener noreferrer">
-                        Examify - The Ultimate Exam Preparation Tool
+                        ExamOven - The Ultimate Exam Preparation Tool
                     </a>
                 </div>
                 {/* <div>Page <span className="page-number"></span></div> */}

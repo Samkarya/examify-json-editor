@@ -15,8 +15,8 @@ const HelpModal: React.FC = () => {
     const helpContent = {
         overview: (
             <>
-                <h4>Welcome to Examify React Editor</h4>
-                <p>This tool helps you create, edit, and validate JSON files for the Examify platform with ease - whether you're a technical expert or completely new to JSON.</p>
+                <h4>Welcome to ExamOven React Editor</h4>
+                <p>This tool helps you create, edit, and validate JSON files for the ExamOven platform with ease - whether you're a technical expert or completely new to JSON.</p>
 
                 <h5>Key Features</h5>
                 <ul>
@@ -40,8 +40,8 @@ const HelpModal: React.FC = () => {
         ),
         jsonFormat: (
             <>
-                <h4>Examify Question JSON Format</h4>
-                <p>The Examify platform expects exam questions as a JSON array of question objects. Each object must follow this structure:</p>
+                <h4>ExamOven Question JSON Format</h4>
+                <p>The ExamOven platform expects exam questions as a JSON array of question objects. Each object must follow this structure:</p>
 
                 <div className="help-code-block">
                     <pre><code>{`[
@@ -119,7 +119,7 @@ const HelpModal: React.FC = () => {
         formattingGuide: (
             <>
                 <h4>Rich Content Formatting Guide</h4>
-                <p>Examify supports rich content in <code>question_text</code>, option values, and <code>explanation</code>.</p>
+                <p>ExamOven supports rich content in <code>question_text</code>, option values, and <code>explanation</code>.</p>
 
                 <h5>1. Mathematical Notation (LaTeX)</h5>
                 <ul>

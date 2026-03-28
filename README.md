@@ -1,9 +1,9 @@
 
-# Examify JSON Editor (React Version)
+# ExamOven JSON Editor (React Version)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A user-friendly, feature-rich JSON editor designed for creating and managing exam questions in the Examify JSON format. This React-based editor provides a form-based interface for easy question creation, a raw JSON editor for advanced users, live preview capabilities, and robust validation.
+A user-friendly, feature-rich JSON editor designed for creating and managing exam questions in the ExamOven JSON format. This React-based editor provides a form-based interface for easy question creation, a raw JSON editor for advanced users, live preview capabilities, and robust validation.
 
 **Live Demo:** [https://samkarya.github.io/examify-json-editor/](https://samkarya.github.io/examify-json-editor/)
 
@@ -19,12 +19,12 @@ This project is an evolution of an earlier vanilla HTML, CSS, and JavaScript ver
     *   Syntax-highlighted code blocks (via Prism.js)
     *   Chemical equations
 *   **Comprehensive Validation:**
-    *   Validates against the Examify question schema (required fields, data types, option consistency, unique question numbers, sequential numbering).
+    *   Validates against the ExamOven question schema (required fields, data types, option consistency, unique question numbers, sequential numbering).
     *   Clear error messages to guide users in fixing issues.
     *   Case-insensitive checking for `correct_answer` against option keys for better usability.
 *   **Templates:** Start quickly with pre-defined question structures for various types (basic MCQ, subject-specific, complex content with LaTeX/code/images).
 *   **Import/Export:**
-    *   Import existing Examify JSON files (via file upload or pasting raw JSON).
+    *   Import existing ExamOven JSON files (via file upload or pasting raw JSON).
     *   Export questions to a `.json` file, with options for pretty-printing.
 *   **Rich Text Support:** Question text, options, and explanations support rich content formatting.
 *   **Responsive Design:** Adapts to different screen sizes for use on desktops, tablets, and mobile devices.

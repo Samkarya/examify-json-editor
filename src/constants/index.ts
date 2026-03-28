@@ -120,10 +120,10 @@ export const TEMPLATES: TemplatesByCategory = {
           topic: 'Python',
           section_id: null,
           question_text:
-            'What is the output of the following Python code?\n\n```python\ndef greet(name):\n  return f"Hello, {name}!"\n\nmessage = greet("Examify")\nprint(message)\n```',
+            'What is the output of the following Python code?\n\n```python\ndef greet(name):\n  return f"Hello, {name}!"\n\nmessage = greet("ExamOven")\nprint(message)\n```',
           options: {
             a: 'Hello, name!',
-            b: 'Hello, Examify!',
+            b: 'Hello, ExamOven!',
             c: 'Syntax Error',
             d: 'None',
           },
