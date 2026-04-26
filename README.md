@@ -43,8 +43,8 @@ This project is an evolution of an earlier vanilla HTML, CSS, and JavaScript ver
 *   **Animations:** [Framer Motion](https://www.framer.com/motion/)
 *   **Layout:** [React Resizable Panels](https://github.com/bvaughn/react-resizable-panels)
 *   **JSON Editor:** [CodeMirror 6](https://codemirror.net/) (via `@uiw/react-codemirror`)
-*   **Markdown Parsing:** [Marked.js](https://marked.js.org/)
-*   **HTML Sanitization:** [DOMPurify](https://github.com/cure53/DOMPurify)
+*   **Markdown Parsing:** [React Markdown](https://github.com/remarkjs/react-markdown)
+*   **HTML Sanitization:** [Rehype Sanitize](https://github.com/rehypejs/rehype-sanitize)
 *   **LaTeX Rendering:** [KaTeX](https://katex.org/)
 *   **Syntax Highlighting (Preview):** [Prism.js](https://prismjs.com/)
 *   **Notifications:** [React Toastify](https://fkhadra.github.io/react-toastify/)
@@ -53,8 +53,6 @@ This project is an evolution of an earlier vanilla HTML, CSS, and JavaScript ver
 *   **Deployment:** [GitHub Pages](https://pages.github.com/) (via GitHub Actions)
 
 ## Project Structure
-
-*(You can include the project structure tree you generated earlier here, or a simplified version)*
 
 ```
  examify-json-editor/
@@ -93,7 +91,7 @@ This project is an evolution of an earlier vanilla HTML, CSS, and JavaScript ver
 
 ### Installation & Setup
 
-1.  **Clone the repository (or the specific subfolder):**
+1.  **Clone the repository:**
     ```bash
     # If cloning the entire 'examify-json-editor' repository
     git clone https://github.com/Samkarya/examify-json-editor.git
@@ -103,15 +101,11 @@ This project is an evolution of an earlier vanilla HTML, CSS, and JavaScript ver
 2.  **Install dependencies:**
     ```bash
     npm install
-    # or
-    yarn install
     ```
 
 3.  **Run the development server:**
     ```bash
     npm run dev
-    # or
-    yarn dev
     ```
     The application will typically be available at `http://localhost:5173` (or another port if 5173 is in use).
 
@@ -121,8 +115,6 @@ To create an optimized production build:
 
 ```bash
 npm run build
-# or
-yarn build
 ```
 The built files will be located in the `dist` directory.
 
@@ -143,15 +135,15 @@ This project is configured for deployment to GitHub Pages.
 2.  **Creating Questions (Form Editor):**
     *   Click "Add Question".
     *   Fill in the required fields (Question Number, Question Text, Options, Correct Answer).
-    *   Utilize rich text formatting (LaTeX, Markdown images, code blocks) in text areas.
+    *   Utilize rich text formatting (LaTeX, Markdown images, code blocks, alerts) in text areas.
     *   Add/remove options as needed (minimum 2).
     *   Save the question.
 
 3.  **Editing Raw JSON:**
     *   Switch to the "JSON Editor" tab.
-    *   Edit the JSON directly. Be mindful of JSON syntax and the Examify schema (see Help Guide for escaping rules for LaTeX/newlines).
+    *   Edit the JSON directly. Be mindful of JSON syntax and the ExamOven schema.
     *   Use "Validate JSON" to check your changes.
-    *   Use "Sync to Form Editor" to reflect JSON changes in the form view (this will overwrite form data).
+    *   Use "Auto-Fix" to repair numbering or formatting issues.
 
 4.  **Using Templates:**
     *   Open the sidebar and go to the "Templates" tab.
@@ -165,51 +157,30 @@ This project is configured for deployment to GitHub Pages.
 
 6.  **Validation:**
     *   Use "Validate Form Data" (in Form Editor) or "Validate JSON" (in JSON Editor) regularly.
-    *   The "Status & Actions" panel in the Form Editor view provides a summary and error details.
-    *   The "Validate All" button in the navbar validates based on the currently active main tab.
 
 7.  **Import/Export:**
-    *   **Import:** Click "Import" in the navbar. Choose to import from a `.json` file or paste raw JSON text.
+    *   **Import:** Click "Import" in the navbar. Choice to import from a `.json` file, paste raw JSON, or receive data from main ExamOven app.
     *   **Export:** Click "Export" in the navbar. Name your file and choose formatting options.
 
 8.  **Help Guide:**
-    *   Access detailed instructions via the "Help" button in the navbar or the "Quick Help" in the sidebar.
+    *   Access detailed instructions via the "Help" button in the navbar.
 
 ## Contributing
 
 Contributions are welcome! If you'd like to contribute, please follow these steps:
 
 1.  **Fork the repository.**
-2.  **Create a new branch** for your feature or bug fix:
-    ```bash
-    git checkout -b feature/your-feature-name
-    # or
-    git checkout -b fix/your-bug-fix-name
-    ```
-3.  **Make your changes.** Ensure your code adheres to the project's coding style (ESLint is configured).
+2.  **Create a new branch** for your feature or bug fix.
+3.  **Make your changes.** Ensure your code adheres to the project's coding style.
 4.  **Test your changes thoroughly.**
-5.  **Commit your changes** with a clear and descriptive commit message:
-    ```bash
-    git commit -m "feat: Add new feature for X"
-    # or
-    git commit -m "fix: Resolve issue Y with Z"
-    ```
-6.  **Push your branch** to your forked repository:
-    ```bash
-    git push origin feature/your-feature-name
-    ```
-7.  **Open a Pull Request** against the `main` branch of the original `Samkarya/examify-json-editor` repository.
-    *   Provide a clear title and description for your pull request, explaining the changes and why they are needed.
-    *   Link to any relevant issues.
-
-Please ensure that your contributions are well-tested and do not break existing functionality.
+5.  **Commit your changes** with a clear and descriptive commit message.
+6.  **Push your branch** to your forked repository.
+7.  **Open a Pull Request** against the `main` branch of the original repository.
 
 ## Future Enhancements (Ideas)
 
-*   Drag-and-drop reordering of questions in the Form Editor.
-*   Auto-saving or "dirty" state indicators.
-*   More advanced JSON editor features (e.g., schema-based autocompletion if feasible with CodeMirror 6).
-*   Enhanced theming options.
+*   Drag-and-drop reordering of questions.
+*   Auto-saving to indexedDB.
 *   Undo/Redo functionality.
 *   More sophisticated template management.
 *   Unit and integration tests.

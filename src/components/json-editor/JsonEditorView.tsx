@@ -5,8 +5,8 @@ import { linter } from "@codemirror/lint";
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { useQuestionsStore } from '../../store/questionsStore';
 import { toast } from 'react-toastify';
-import { validateRawJsonString, formatValidationErrors } from '../../services/validationService';
-import { CheckCircle, RefreshCw } from 'lucide-react';
+import { validateRawJsonString, formatValidationErrors, autoFixRawJsonString } from '../../services/validationService';
+import { CheckCircle, RefreshCw, Wand2 } from 'lucide-react';
 import { EditorView } from '@codemirror/view';
 
 const JsonEditorView: React.FC = () => {
@@ -64,6 +64,18 @@ const JsonEditorView: React.FC = () => {
     }, 300);
   };
 
+  const handleAutoFix = () => {
+    const { fixedJson, error } = autoFixRawJsonString(jsonEditorContent);
+    if (error) {
+      toast.error(error);
+      setEditorStatus({ type: 'error', message: error });
+    } else if (fixedJson) {
+      setJsonEditorContent(fixedJson);
+      toast.success("JSON Auto-formatted and fixed!");
+      setEditorStatus({ type: 'success', message: 'JSON auto-fixed and formatted successfully!' });
+    }
+  };
+
   const handleSyncToForm = () => {
     if (editorStatus && editorStatus.type === 'error') setEditorStatus(null);
     updateStateFromJsonEditor();
@@ -74,6 +86,9 @@ const JsonEditorView: React.FC = () => {
       <div className="panel-header">
         <span>Raw JSON</span>
         <div className="d-flex gap-2">
+          <button className="btn btn-sm btn-light border d-flex align-items-center" onClick={handleAutoFix} title="Auto-Format & Fix Sequence">
+            <Wand2 size={14} className="me-1" /> Auto-Fix
+          </button>
           <button className="btn btn-sm btn-light border d-flex align-items-center" onClick={handleValidateJson}>
             <CheckCircle size={14} className="me-1" /> Validate
           </button>

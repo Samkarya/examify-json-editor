@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuestionsStore } from '../../store/questionsStore';
-import { AlertCircle, CheckCircle2, FileJson, AlertTriangle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FileJson } from 'lucide-react';
 
 const StatusBar: React.FC = () => {
     const questions = useQuestionsStore((state) => state.questions);
@@ -41,7 +41,7 @@ const StatusBar: React.FC = () => {
             {/* Right Section: Context Info */}
             <div className="d-flex align-items-center gap-3">
                 <span>{activeMainView === 'json' ? 'JSON Mode' : 'Form Mode'}</span>
-                <span className="border-start ps-3">Examify Editor v1.0</span>
+                <span className="border-start ps-3">ExamOven Editor v1.0</span>
             </div>
         </div>
     );

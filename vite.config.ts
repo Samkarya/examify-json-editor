@@ -1,4 +1,4 @@
-// PlugIn/examify-json-editor/vite.config.ts
+// PlugIn/examoven-json-editor/vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -7,7 +7,7 @@ export default defineConfig(({ command }) => {
   const base = command === 'build' ? `/${githubRepoName}/` : '/';
   return {
     plugins: [react()],
-    base: base, // Will be /PlugIn/examify-json-editor/ for builds
+    base: base, // Will be /PlugIn/examoven-json-editor/ for builds
     build: {
       outDir: 'dist',
     },

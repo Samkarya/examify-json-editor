@@ -4,7 +4,7 @@ import type { Question, TemplatesByCategory } from '../types/Question';
 
 export const GITHUB_QUESTIONS_REPO_RAW_BASE_URL = 'https://raw.githubusercontent.com/Samkarya/online-exam-questions/main/';
 
-export const APP_NAME = 'Examify React Editor';
+export const APP_NAME = 'ExamOven Editor';
 
 // Using Partial<Question> for template data as 'id' will be generated dynamically
 // and other fields might be pre-filled or left for the user.
@@ -129,7 +129,7 @@ export const TEMPLATES: TemplatesByCategory = {
           },
           correct_answer: 'b',
           explanation:
-            'The function `greet` formats a string with the provided name. When called with "Examify", it returns "Hello, Examify!", which is then printed.',
+            'The function `greet` formats a string with the provided name. When called with "ExamOven", it returns "Hello, ExamOven!", which is then printed.',
         },
       ],
     },
@@ -187,7 +187,7 @@ export const TEMPLATES: TemplatesByCategory = {
 export const INITIAL_QUESTION_DATA_EXAMPLE: Partial<Question>[] = [
   {
     question_number: 1,
-    question_text: "Welcome to Examify! What is the capital of France?",
+    question_text: "Welcome to ExamOven! What is the capital of France?",
     options: { "a": "Berlin", "b": "Madrid", "c": "Paris", "d": "Rome" },
     correct_answer: "c",
     subject: "Geography",
@@ -201,4 +201,4 @@ export const INITIAL_QUESTION_DATA_EXAMPLE: Partial<Question>[] = [
 export type MainView = 'form' | 'json' | 'preview';
 export type SidebarTab = 'templates' | 'quickHelp';
 
-export const DEFAULT_FILENAME = 'examify_questions.json';
+export const DEFAULT_FILENAME = 'examoven_questions.json';

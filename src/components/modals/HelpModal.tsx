@@ -158,7 +158,7 @@ const HelpModal: React.FC = () => {
         aiGenerationGuide: (
             <>
                 <h4>Using AI to Generate Questions</h4>
-                <p>You can use AI tools to generate JSON. Ensure you prompt the AI to follow the <strong>Examify JSON Schema</strong>.</p>
+                <p>You can use AI tools to generate JSON. Ensure you prompt the AI to follow the <strong>ExamOven JSON Schema</strong>.</p>
 
                 <h5>Crucial Prompting Tips:</h5>
                 <ul>
@@ -191,7 +191,7 @@ const HelpModal: React.FC = () => {
                 <p>Click <strong>Import</strong> in the Toolbar. You can drag & drop a <code>.json</code> file or paste raw text.</p>
 
                 <h5>Exporting</h5>
-                <p>Click <strong>Export</strong> in the Toolbar. This downloads your work as a <code>.json</code> file ready for the Examify platform.</p>
+                <p>Click <strong>Export</strong> in the Toolbar. This downloads your work as a <code>.json</code> file ready for the ExamOven platform.</p>
             </>
         )
     };
@@ -212,7 +212,7 @@ const HelpModal: React.FC = () => {
         <AppModal
             show={isOpen}
             onHide={handleClose}
-            title={"Examify Editor Guide"}
+            title={"ExamOven Editor Guide"}
             size="xl"
             scrollable
         >

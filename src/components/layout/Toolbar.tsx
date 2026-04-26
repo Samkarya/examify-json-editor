@@ -19,9 +19,14 @@ const Toolbar: React.FC = () => {
     const exportFileName = useQuestionsStore((state) => state.exportFileName);
 
     const handlePrint = (showAnswers: boolean) => {
-        localStorage.setItem('examify-print-data', JSON.stringify(questions));
-        localStorage.setItem('examify-print-title', exportFileName.replace('.json', ''));
-        window.open(`https://samkarya.github.io/examify-json-editor/?mode=print&showAnswers=${showAnswers}`, '_blank');
+        localStorage.setItem('examoven-print-data', JSON.stringify(questions));
+        localStorage.setItem('examoven-print-title', exportFileName.replace('.json', ''));
+        
+        const printUrl = import.meta.env.DEV 
+            ? `http://localhost:5173/?mode=print&showAnswers=${showAnswers}`
+            : `https://samkarya.github.io/examify-json-editor/?mode=print&showAnswers=${showAnswers}`;
+            
+        window.open(printUrl, '_blank');
     };
 
     const handleValidateGlobalClick = () => {

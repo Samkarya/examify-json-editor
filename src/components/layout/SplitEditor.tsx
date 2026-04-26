@@ -13,7 +13,7 @@ const SplitEditor: React.FC = () => {
 
   return (
     <div className="h-100 w-100">
-      <PanelGroup direction="horizontal" autoSaveId="examify-split-layout">
+      <PanelGroup direction="horizontal" autoSaveId="examoven-split-layout">
         {/* Left Pane: Editor (Form or JSON) */}
         <Panel defaultSize={50} minSize={30} className="bg-white">
           <div className="d-flex flex-column h-100">

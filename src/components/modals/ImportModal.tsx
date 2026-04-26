@@ -6,7 +6,7 @@ import { useQuestionsStore } from '../../store/questionsStore';
 import { toast } from 'react-toastify';
 import type { Question } from '../../types/Question'; // For type casting
 import { v4 as uuidv4 } from 'uuid';
-import { validateRawJsonString, formatValidationErrors } from '../../services/validationService';
+import { validateRawJsonString, formatValidationErrors, autoFixRawJsonString } from '../../services/validationService';
 
 const ImportModal: React.FC = () => {
   const isOpen = useQuestionsStore((state) => state.isImportModalOpen);
@@ -72,11 +72,17 @@ const ImportModal: React.FC = () => {
 
   const processImport = (jsonString: string) => {
     setLoading(true, "Importing and validating JSON...");
+
+    // Try to auto-fix the string before validating (fixes sequencing and strips Codeblock wraps)
+    const { fixedJson } = autoFixRawJsonString(jsonString);
+    const safeString = fixedJson || jsonString;
+
     setTimeout(() => { // Simulate async
-      const { data: parsedQuestions, errors: validationServiceErrors } = validateRawJsonString(jsonString);
+      const { data: parsedQuestions, errors: validationServiceErrors } = validateRawJsonString(safeString);
       if (validationServiceErrors.length > 0 || !parsedQuestions) {
-        setError(`Import Error: ${formatValidationErrors(validationServiceErrors).join('; ')}`);
-        toast.error("Failed to import JSON. Please check the format and content.");
+        const errorMsg = formatValidationErrors(validationServiceErrors).join('; ');
+        setError(`Import Error: ${errorMsg}`);
+        toast.error(`Failed to import JSON: ${errorMsg}`);
         setLoading(false);
         return;
       }
@@ -131,16 +137,21 @@ const ImportModal: React.FC = () => {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // Ensure the message is from the expected origin
-      if (event.origin === ('https://examoven.com') || event.origin === ('https://www.examoven.com') || event.origin === ('https://examify.web.app')) {
+      // Ensure the message is from the expected origin (including dev servers)
+      const allowedOrigins = [
+        'https://examoven.com',
+        'https://www.examoven.com',
+        'https://examify.web.app',
+        'https://samkarya.github.io',
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174'
+      ];
+
+      if (allowedOrigins.includes(event.origin)) {
         const { type, payload } = event.data;
         if (type === 'loadExamJson' && typeof payload === 'string') {
-          try {
-            processImport(payload);
-            toast.success('JSON data received and loaded into editor!');
-          } catch (error) {
-            toast.error('Failed to process received JSON data.');
-          }
+          processImport(payload);
         }
       }
     };

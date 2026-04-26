@@ -1,13 +1,13 @@
 // src/components/layout/MainLayoutComponent.tsx
 import React from 'react';
 import { Container, Tabs, Tab } from 'react-bootstrap';
-import type { MainTabKey } from '../../App'; // Assuming MainTabKey is exported from App.tsx or a types file
+import type { MainView } from '../../constants';
 
 interface MainLayoutComponentProps {
   isSidebarOpen: boolean;
   children: React.ReactNode; // Content of the active tab
-  activeMainTabKey: MainTabKey;
-  onSelectMainTab: (selectedTabKey: MainTabKey | null) => void;
+  activeMainTabKey: MainView;
+  onSelectMainTab: (selectedTabKey: MainView | null) => void;
 }
 
 const MainLayoutComponent: React.FC<MainLayoutComponentProps> = ({
@@ -18,17 +18,17 @@ const MainLayoutComponent: React.FC<MainLayoutComponentProps> = ({
 }) => {
   return (
     <main
-      className={`main-content-examify ${!isSidebarOpen ? 'sidebar-collapsed' : ''}`}
+      className={`main-content-examoven ${!isSidebarOpen ? 'sidebar-collapsed' : ''}`}
       id="mainContent" // Matching ID from original prototype for potential CSS or direct selection
     >
       <Container fluid className="pt-3"> {/* Added some padding top */}
         <Tabs
           id="main-content-tabs"
           activeKey={activeMainTabKey}
-          onSelect={(k) => onSelectMainTab(k as MainTabKey | null)} // k can be string | null
-          className="nav-tabs-examify mb-4" // Use custom class for specific styling if needed
-          // mountOnEnter // Optional: only mount tab content when tab is first selected
-          // unmountOnExit // Optional: unmount tab content when tab is deselected
+          onSelect={(k) => onSelectMainTab(k as MainView | null)} // k can be string | null
+          className="nav-tabs-examoven mb-4" // Use custom class for specific styling if needed
+        // mountOnEnter // Optional: only mount tab content when tab is first selected
+        // unmountOnExit // Optional: unmount tab content when tab is deselected
         >
           <Tab
             eventKey="form"
@@ -38,7 +38,7 @@ const MainLayoutComponent: React.FC<MainLayoutComponentProps> = ({
               </>
             }
           >
-            {activeMainTabKey === 'form' && children} 
+            {activeMainTabKey === 'form' && children}
             {/* Conditionally render children only if this tab is active 
                 to ensure correct content is shown if not using mountOnEnter/unmountOnExit */}
           </Tab>
@@ -63,7 +63,7 @@ const MainLayoutComponent: React.FC<MainLayoutComponentProps> = ({
             {activeMainTabKey === 'preview' && children}
           </Tab>
         </Tabs>
-        
+
         {/* 
           If NOT conditionally rendering children inside <Tab>, 
           the children would be directly here, and react-bootstrap's Tabs
@@ -77,10 +77,10 @@ const MainLayoutComponent: React.FC<MainLayoutComponentProps> = ({
         */}
 
       </Container>
-      
+
       {/* Footer can be added here if it's part of the main scrollable area */}
       {/* <footer className="footer-examify">
-        <p>© {new Date().getFullYear()} Examify JSON Editor. For Examify Online Practice Platform. MIT License.</p>
+        <p>© {new Date().getFullYear()} ExamOven Editor. For ExamOven Platform. MIT License.</p>
       </footer> */}
     </main>
   );

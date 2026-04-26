@@ -147,20 +147,47 @@ export const validateQuestionsData = (questions: QuestionsData): ValidationError
   return allErrors;
 };
 
+export const cleanJsonString = (rawString: string): string => {
+  let cleaned = rawString.trim();
+  if (cleaned.startsWith('```json')) cleaned = cleaned.substring(7);
+  else if (cleaned.startsWith('```')) cleaned = cleaned.substring(3);
+  if (cleaned.endsWith('```')) cleaned = cleaned.substring(0, cleaned.length - 3);
+  return cleaned.trim();
+};
+
+export const autoFixRawJsonString = (jsonString: string): { fixedJson: string | null; error: string | null } => {
+  const cleaned = cleanJsonString(jsonString);
+  try {
+    const data = JSON.parse(cleaned);
+    if (!Array.isArray(data)) {
+        return { fixedJson: null, error: "Top level must be an array." };
+    }
+    const fixedData = data.map((q: any, index: number) => {
+        if (typeof q === 'object' && q !== null) {
+            return { ...q, question_number: index + 1 };
+        }
+        return q;
+    });
+    return { fixedJson: JSON.stringify(fixedData, null, 4), error: null };
+  } catch (err: any) {
+    return { fixedJson: null, error: `Invalid JSON: ${err.message}` };
+  }
+};
 
 export const validateRawJsonString = (
   jsonString: string
 ): { data: Omit<Question, 'id'>[] | null; errors: ValidationError[] } => {
   const allErrors: ValidationError[] = [];
   let parsedData: any = null;
+  const cleanedJsonString = cleanJsonString(jsonString);
 
-  if (jsonString.trim() === "") {
+  if (cleanedJsonString.trim() === "") {
     allErrors.push({ message: "JSON content cannot be empty. It should be an array, e.g., '[]'." });
     return { data: null, errors: allErrors };
   }
 
   try {
-    parsedData = JSON.parse(jsonString);
+    parsedData = JSON.parse(cleanedJsonString);
   } catch (err: any) {
     allErrors.push({ message: `Invalid JSON syntax: ${err.message}. (Check for missing/extra commas, quotes, or brackets)` });
     return { data: null, errors: allErrors };

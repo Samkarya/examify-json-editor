@@ -70,16 +70,16 @@ export const useQuestionsStore = create<QuestionsState>()(
     persist(
       (set, get) => ({
         questions: INITIAL_QUESTION_DATA_EXAMPLE.map(q => ({
-            id: uuidv4(), // Ensure each initial question has a unique ID
-            question_number: q.question_number || 1,
-            question_text: q.question_text || '',
-            options: q.options || { a: '', b: '' },
-            correct_answer: q.correct_answer || 'a',
-            subject: q.subject,
-            topic: q.topic,
-            explanation: q.explanation,
-            difficulty: q.difficulty,
-            section_id: q.section_id,
+          id: uuidv4(), // Ensure each initial question has a unique ID
+          question_number: q.question_number || 1,
+          question_text: q.question_text || '',
+          options: q.options || { a: '', b: '' },
+          correct_answer: q.correct_answer || 'a',
+          subject: q.subject,
+          topic: q.topic,
+          explanation: q.explanation,
+          difficulty: q.difficulty,
+          section_id: q.section_id,
         })),
         currentEditId: null,
         activeMainView: 'form',
@@ -112,7 +112,7 @@ export const useQuestionsStore = create<QuestionsState>()(
             question_number: questionData.question_number || nextQNum,
             question_text: questionData.question_text || '',
             options: questionData.options || { a: 'Option A', b: 'Option B' },
-            correct_answer: questionData.correct_answer || Object.keys(questionData.options || {a:''})[0] || 'a',
+            correct_answer: questionData.correct_answer || Object.keys(questionData.options || { a: '' })[0] || 'a',
             subject: questionData.subject || null,
             topic: questionData.topic || null,
             explanation: questionData.explanation || null,
@@ -220,11 +220,11 @@ export const useQuestionsStore = create<QuestionsState>()(
             if (validationServiceErrors.length > 0 || !parsedQuestions) {
               // Instead of using JSX in store, create a formatted message string
               toast.error(
-                `JSON from editor is invalid. Cannot sync to Form. Issues: ${formatValidationErrors(validationServiceErrors).join(', ')}`, 
+                `JSON from editor is invalid. Cannot sync to Form. Issues: ${formatValidationErrors(validationServiceErrors).join(', ')}`,
                 { autoClose: 10000 }
               );
               setLoading(false);
-              return; 
+              return;
             }
 
             const questionsWithClientIds: Question[] = parsedQuestions.map(q => ({
@@ -236,16 +236,16 @@ export const useQuestionsStore = create<QuestionsState>()(
               difficulty: q.difficulty !== undefined ? q.difficulty : '',
               section_id: q.section_id !== undefined ? q.section_id : null,
             }));
-            
+
             setStoreQuestions(questionsWithClientIds); // This also updates jsonEditorContent via its own internal sync
             toast.success("JSON content successfully synced to Form Editor!");
             setLoading(false);
           }, 50); // Short timeout
         },
-        setExportFileName: (name) => set({ exportFileName: name}, false, 'setExportFileName'),
+        setExportFileName: (name) => set({ exportFileName: name }, false, 'setExportFileName'),
         clearValidationErrors: () => set({ validationErrors: [] }, false, 'clearValidationErrors'),
-        addValidationError: (error) => set(state => ({ validationErrors: [...state.validationErrors, error]}), false, 'addValidationError'),
-        setValidationErrors: (errors) => set({ validationErrors: errors}, false, 'setValidationErrors'),
+        addValidationError: (error) => set(state => ({ validationErrors: [...state.validationErrors, error] }), false, 'addValidationError'),
+        setValidationErrors: (errors) => set({ validationErrors: errors }, false, 'setValidationErrors'),
         getQuestionById: (id: string) => {
           return get().questions.find(q => q.id === id);
         },
@@ -256,43 +256,43 @@ export const useQuestionsStore = create<QuestionsState>()(
         },
         generateNewQuestionId: () => uuidv4(),
         duplicateQuestion: (idToDuplicate: string) => {
-            const originalQuestion = get().getQuestionById(idToDuplicate);
-            if (!originalQuestion) return;
+          const originalQuestion = get().getQuestionById(idToDuplicate);
+          if (!originalQuestion) return;
 
-            const duplicatedQuestionData: Partial<Question> = {
-                ...originalQuestion, // Spread all properties
-                id: get().generateNewQuestionId(), // New unique ID
-                question_number: get().getNextQuestionNumber(), // New question number
-                question_text: `(Copy of Q#${originalQuestion.question_number}) ${originalQuestion.question_text}`,
-            };
-            delete duplicatedQuestionData._isDirty; // Remove internal flags if any
+          const duplicatedQuestionData: Partial<Question> = {
+            ...originalQuestion, // Spread all properties
+            id: get().generateNewQuestionId(), // New unique ID
+            question_number: get().getNextQuestionNumber(), // New question number
+            question_text: `(Copy of Q#${originalQuestion.question_number}) ${originalQuestion.question_text}`,
+          };
+          delete duplicatedQuestionData._isDirty; // Remove internal flags if any
 
-            get().addQuestion(duplicatedQuestionData); // addQuestion handles sorting and editor update
+          get().addQuestion(duplicatedQuestionData); // addQuestion handles sorting and editor update
         },
         sortQuestionsByNumber: () => {
-            set(state => {
-                const sortedQuestions = [...state.questions].sort((a,b) => a.question_number - b.question_number);
-                return { questions: sortedQuestions };
-            }, false, 'sortQuestionsByNumber');
-            // No need to call updateJsonEditorContentFromState here as individual actions (add, update, loadTemplate) already do.
+          set(state => {
+            const sortedQuestions = [...state.questions].sort((a, b) => a.question_number - b.question_number);
+            return { questions: sortedQuestions };
+          }, false, 'sortQuestionsByNumber');
+          // No need to call updateJsonEditorContentFromState here as individual actions (add, update, loadTemplate) already do.
         },
         setQuestionModalOpen: (isOpen) => set({ isQuestionModalOpen: isOpen, currentEditId: isOpen ? get().currentEditId : null }, false, 'setQuestionModalOpen'),
         setImportModalOpen: (isOpen) => set({ isImportModalOpen: isOpen }, false, 'setImportModalOpen'),
         setExportModalOpen: (isOpen) => set({ isExportModalOpen: isOpen }, false, 'setExportModalOpen'),
         setHelpModalOpen: (isOpen) => set({ isHelpModalOpen: isOpen }, false, 'setHelpModalOpen'),
         triggerFormValidation: () => {
-            const { questions, setValidationErrors } = get();
-            const errors = validateQuestionsData(questions);
-            setValidationErrors(formatValidationErrors(errors));
-            return errors.length === 0;
+          const { questions, setValidationErrors } = get();
+          const errors = validateQuestionsData(questions);
+          setValidationErrors(formatValidationErrors(errors));
+          return errors.length === 0;
         },
         triggerJsonEditorValidation: () => {
-            const { jsonEditorContent } = get();
-            // This validation only checks structure. The JsonEditorView handles displaying editor-specific status.
-            const { errors } = validateRawJsonString(jsonEditorContent);
-            // We might want a global error display or rely on JsonEditorView's status.
-            // For now, just return validity.
-            return errors.length === 0;
+          const { jsonEditorContent } = get();
+          // This validation only checks structure. The JsonEditorView handles displaying editor-specific status.
+          const { errors } = validateRawJsonString(jsonEditorContent);
+          // We might want a global error display or rely on JsonEditorView's status.
+          // For now, just return validity.
+          return errors.length === 0;
         },
       }),
       {
