@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState} from 'react';
 import type { Question } from '../../types/Question';
 import '../../styles/print.css';
 import RichTextRenderer from '../common/RichTextRenderer';
@@ -31,10 +31,6 @@ const PrintView: React.FC = () => {
     const currentDate = new Date().toLocaleDateString('en-US', {
         year: 'numeric', month: 'long', day: 'numeric'
     });
-
-    const stats = useMemo(() => {
-        return { totalMarks: questions.length };
-    }, [questions]);
 
     /* ─────────────────────────────────────────────
        We use a <table> with <thead> / <tfoot> so
