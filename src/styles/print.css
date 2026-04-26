@@ -1,256 +1,546 @@
-/* src/styles/print.css */
-/* Container Reset */
-.print-container {
-    width: 100% !important;
-    max-width: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
+/* ═══════════════════════════════════════════════════
+   ExamOven Print Stylesheet
+   Premium exam paper layout for PDF export
+   Uses <table> thead/tfoot for per-page header/footer
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Design Tokens ─── */
+:root {
+    --eo-brand: #1a73e8;
+    --eo-brand-dark: #1557b0;
+    --eo-brand-light: #e8f0fe;
+    --eo-brand-subtle: #f1f5fd;
+    --eo-success: #1e8e3e;
+    --eo-success-bg: #e6f4ea;
+    --eo-success-border: #ceead6;
+    --eo-text: #202124;
+    --eo-text-secondary: #5f6368;
+    --eo-text-muted: #80868b;
+    --eo-border: #dadce0;
+    --eo-border-light: #e8eaed;
+    --eo-bg-subtle: #f8f9fa;
+    --eo-bg-page: #ffffff;
+    --eo-radius: 8px;
+    --eo-radius-sm: 4px;
+    --eo-font: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
-/* Header Styling */
+/* ─── Page Reset ─── */
+.print-page {
+    font-family: var(--eo-font);
+    color: var(--eo-text);
+    background: var(--eo-bg-page);
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 24px 32px;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════════════
+   TABLE LAYOUT — enables repeating header/footer
+   The <table> structure with <thead>/<tfoot> is the
+   only cross-browser way to repeat on every page.
+   ═══════════════════════════════════════════════════ */
+
+.print-layout-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
+}
+
+.print-layout-table th,
+.print-layout-table td {
+    padding: 0;
+    border: none;
+    text-align: left;
+    font-weight: normal;
+}
+
+.print-body-cell {
+    vertical-align: top;
+}
+
+/* ═══════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════ */
+
 .print-header {
-    display: flex !important;
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid #0d6efd;
-    padding-bottom: 15px;
-    margin-bottom: 30px;
+    padding: 8px 0 12px 0;
+    border-bottom: 3px solid var(--eo-brand);
+    position: relative;
+    margin-bottom: 16px;
 }
 
-.print-logo {
-    height: 50px;
-    width: auto;
+/* Google-style gradient accent under the header */
+.print-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--eo-brand) 0%, #4285f4 40%, #34a853 60%, #fbbc04 80%, #ea4335 100%);
 }
 
-.print-title {
-    font-size: 24px;
+.print-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.print-header__logo-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--eo-brand) 0%, #4285f4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+    flex-shrink: 0;
+}
+
+.print-header__logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    object-fit: contain;
+}
+
+.print-header__title-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.print-header__title {
+    font-size: 20px;
     font-weight: 700;
-    color: #0d6efd;
+    color: var(--eo-text);
     margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
-.print-meta,
-.print-footer div a {
-    font-size: 12px;
-    color: #6c757d;
+.print-header__subtitle {
+    font-size: 11px;
+    color: var(--eo-text-secondary);
+    margin: 2px 0 0 0;
+    letter-spacing: 0.01em;
+}
+
+.print-header__subtitle strong {
+    color: var(--eo-brand);
+}
+
+/* Meta info (right side) */
+.print-header__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: right;
+    flex-shrink: 0;
+    border-left: 2px solid var(--eo-border-light);
+    padding-left: 14px;
+    margin-left: 14px;
+}
+
+.print-header__meta-row {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    justify-content: flex-end;
+    align-items: baseline;
+}
+
+.print-header__meta-label {
+    color: var(--eo-text-muted);
+    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+}
+
+.print-header__meta-value {
+    color: var(--eo-text);
+    font-weight: 600;
+    min-width: 36px;
+}
+
+/* ═══════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════ */
+
+.print-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0 0 0;
+    margin-top: 16px;
+    font-size: 9px;
+    color: var(--eo-text-muted);
+    border-top: 1px solid var(--eo-border-light);
+}
+
+.print-footer a {
+    color: var(--eo-brand);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.print-footer__left,
+.print-footer__center,
+.print-footer__right {
+    flex: 1;
+}
+
+.print-footer__center {
+    text-align: center;
+}
+
+.print-footer__right {
     text-align: right;
 }
 
-/* Question Card Styling */
-.question-card {
+/* ═══════════════════════════════════════════════════
+   QUESTIONS
+   ═══════════════════════════════════════════════════ */
+
+.print-questions {
+    /* container for all questions */
+}
+
+/* Individual Question Block */
+.print-q {
     break-inside: avoid;
     page-break-inside: avoid;
-    border: 1px solid #e9ecef !important;
-    border-radius: 8px !important;
-    margin-bottom: 20px !important;
-    padding: 20px !important;
-    background-color: #fff !important;
-    box-shadow: none !important;
+    margin-bottom: 8px;
 }
 
-.question-number {
-    font-size: 16px;
+.print-q__header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.print-q__number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--eo-brand), #4285f4);
+    color: white;
     font-weight: 700;
-    color: #0d6efd;
-    min-width: 40px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 1px 3px rgba(26, 115, 232, 0.2);
 }
 
-.question-text {
-    font-size: 15px;
-    line-height: 1.5;
-    color: #212529;
+.print-q__body {
+    flex: 1;
+    min-width: 0;
 }
 
-.question-text img {
+.print-q__text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--eo-text);
+}
+
+/* Clean up RichTextRenderer spacing */
+.print-q__text .preview-rich-text-content > :first-child {
+    margin-top: 0;
+}
+.print-q__text .preview-rich-text-content > :last-child {
+    margin-bottom: 0;
+}
+
+.print-q__text img {
     max-width: 100%;
     height: auto;
+    border-radius: var(--eo-radius-sm);
 }
 
-/* Options Styling */
-.option-item {
+/* Tags */
+.print-q__tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.print-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.print-tag--subject {
+    background: #e8f0fe;
+    color: #1a73e8;
+}
+
+.print-tag--topic {
+    background: #fce8e6;
+    color: #d93025;
+}
+
+.print-tag--easy {
+    background: #e6f4ea;
+    color: #1e8e3e;
+}
+
+.print-tag--medium {
+    background: #fef7e0;
+    color: #e37400;
+}
+
+.print-tag--hard {
+    background: #fce8e6;
+    color: #c5221f;
+}
+
+/* ─── Options ─── */
+.print-q__options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+    margin-left: 44px;
+    margin-bottom: 8px;
+}
+
+.print-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--eo-border-light);
+    border-radius: var(--eo-radius-sm);
+    background: var(--eo-bg-page);
+    position: relative;
+}
+
+.print-option--correct {
+    background: var(--eo-success-bg) !important;
+    border-color: var(--eo-success-border) !important;
+}
+
+.print-option__key {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--eo-bg-subtle);
+    border: 1.5px solid var(--eo-border);
+    color: var(--eo-text-secondary);
+    font-weight: 700;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.print-option__key--correct {
+    background: var(--eo-success) !important;
+    border-color: var(--eo-success) !important;
+    color: white !important;
+}
+
+.print-option__value {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--eo-text);
+    min-width: 0;
+}
+
+.print-option__value .preview-rich-text-content > :first-child {
+    margin-top: 0;
+}
+.print-option__value .preview-rich-text-content > :last-child {
+    margin-bottom: 0;
+}
+.print-option__value p {
+    margin: 0;
+}
+
+.print-option__check {
+    color: var(--eo-success);
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ─── Answer + Explanation ─── */
+.print-q__answer {
+    margin-left: 44px;
     margin-bottom: 8px;
     display: flex;
+    gap: 12px;
     align-items: flex-start;
 }
 
-.option-badge {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 8px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    margin-right: 10px;
-    min-width: 30px;
-    text-align: center;
-    background-color: #f8f9fa !important;
-    color: #495057 !important;
-}
-
-/* Answer Section */
-.answer-section {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px dashed #dee2e6;
-    background-color: #f8f9fa !important;
-    padding: 15px;
-    border-radius: 6px;
-}
-
-.correct-answer {
-    color: #198754 !important;
-    font-weight: 700;
-}
-
-/* Footer Styling */
-.print-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding-top: 10px;
-    border-top: 1px solid #dee2e6;
+.print-q__answer-badge {
     display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: #adb5bd;
-    background-color: #fff;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    background: var(--eo-success-bg);
+    border: 1px solid var(--eo-success-border);
+    border-radius: var(--eo-radius);
+    padding: 6px 12px;
 }
+
+.print-q__answer-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--eo-text-muted);
+}
+
+.print-q__answer-value {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--eo-success);
+    line-height: 1;
+}
+
+.print-q__explanation {
+    flex: 1;
+    background: var(--eo-bg-subtle);
+    border: 1px solid var(--eo-border-light);
+    border-radius: var(--eo-radius);
+    padding: 10px 14px;
+    min-width: 0;
+}
+
+.print-q__explanation-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--eo-text-muted);
+    margin-bottom: 4px;
+}
+
+.print-q__explanation-body {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--eo-text-secondary);
+}
+
+.print-q__explanation-body .preview-rich-text-content > :first-child {
+    margin-top: 0;
+}
+.print-q__explanation-body .preview-rich-text-content > :last-child {
+    margin-bottom: 0;
+}
+
+/* ─── Question Divider ─── */
+.print-q__divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--eo-border) 20%, var(--eo-border) 80%, transparent 100%);
+    margin: 16px 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   PRINT MEDIA
+   ═══════════════════════════════════════════════════ */
 
 @media print {
     @page {
-        margin: 5mm 5mm 5mm 5mm;
+        margin: 8mm 8mm 10mm 8mm;
         size: A4;
     }
 
-    body {
-        background-color: #fff !important;
-        color: #1a1a1a !important;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+        font-family: var(--eo-font) !important;
     }
 
-    /* Hide non-print elements just in case */
     .no-print {
         display: none !important;
     }
 
-    /* Container Reset */
-    .print-container {
-        width: 100% !important;
-        max-width: none !important;
+    .print-page {
         padding: 0 !important;
-        margin: 0 !important;
+        max-width: none !important;
     }
 
-    /* Header Styling */
-    .print-header {
-        display: flex !important;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 2px solid #0d6efd;
-        padding-bottom: 15px;
-        margin-bottom: 30px;
+    /* Table layout: browser repeats thead/tfoot on each page */
+    .print-layout-table {
+        width: 100%;
     }
 
-    .print-logo {
-        height: 50px;
-        width: auto;
+    /* Ensure page breaks work */
+    .print-q {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
     }
 
-    .print-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: #0d6efd;
-        margin: 0;
+    /* Force colors to print */
+    .print-header__logo-wrap,
+    .print-q__number,
+    .print-option__key--correct,
+    .print-option--correct,
+    .print-q__answer-badge,
+    .print-tag {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
-    .print-meta {
-        font-size: 12px;
-        color: #6c757d;
-        text-align: right;
-    }
-
-    /* Question Card Styling */
-    .question-card {
+    /* Keep images from breaking pages */
+    img {
         break-inside: avoid;
         page-break-inside: avoid;
-        border: 1px solid #e9ecef !important;
-        border-radius: 8px !important;
-        margin-bottom: 20px !important;
-        padding: 20px !important;
-        background-color: #fff !important;
-        box-shadow: none !important;
     }
 
-    .question-number {
-        font-size: 16px;
-        font-weight: 700;
-        color: #0d6efd;
-        min-width: 40px;
+    /* KaTeX print fix */
+    .katex .base {
+        display: inline !important;
     }
 
-    .question-text {
-        font-size: 15px;
-        line-height: 1.5;
-        color: #212529;
+    /* Code blocks */
+    pre, code {
+        font-size: 11px !important;
+        break-inside: avoid;
     }
 
-    .question-text img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    /* Options Styling */
-    .option-item {
-        margin-bottom: 8px;
-        display: flex;
-        align-items: flex-start;
-    }
-
-    .option-badge {
+    /* Tables inside questions */
+    .print-q table {
+        break-inside: avoid;
         font-size: 12px;
-        font-weight: 600;
-        padding: 4px 8px;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        margin-right: 10px;
-        min-width: 30px;
-        text-align: center;
-        background-color: #f8f9fa !important;
-        color: #495057 !important;
+    }
+}
+
+/* ─── Screen-only: nice preview before printing ─── */
+@media screen {
+    .print-page {
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        margin: 20px auto;
+        padding: 40px;
     }
 
-    /* Answer Section */
-    .answer-section {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px dashed #dee2e6;
-        background-color: #f8f9fa !important;
-        padding: 15px;
-        border-radius: 6px;
+    body {
+        background: #e8eaed !important;
+        overflow: auto !important;
+        height: auto !important;
     }
-
-    .correct-answer {
-        color: #198754 !important;
-        font-weight: 700;
-    }
-
-    /* Footer Styling */
-    .print-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding-top: 10px;
-        border-top: 1px solid #dee2e6;
-        display: flex;
-        justify-content: space-between;
-        font-size: 10px;
-        color: #adb5bd;
-        background-color: #fff;
-    }
-
-    /* Page Numbers */
-    /* Note: Browser support for page numbers in content is limited, typically handled by browser print settings */
 }
