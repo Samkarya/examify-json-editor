@@ -2,41 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
 import rehypeExternalLinks from 'rehype-external-links';
 import type { Schema } from 'hast-util-sanitize';
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { PrismAsyncLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import tsx from 'react-syntax-highlighter/dist/esm/languages/prism/tsx';
-import typescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
-import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
-import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
-import java from 'react-syntax-highlighter/dist/esm/languages/prism/java';
-import c from 'react-syntax-highlighter/dist/esm/languages/prism/c';
-import cpp from 'react-syntax-highlighter/dist/esm/languages/prism/cpp';
-import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
-import json from 'react-syntax-highlighter/dist/esm/languages/prism/json';
-import css from 'react-syntax-highlighter/dist/esm/languages/prism/css';
-import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown';
 import { GITHUB_QUESTIONS_REPO_RAW_BASE_URL } from '../../constants';
 import { FaCopy, FaCheck, FaInfoCircle, FaLightbulb, FaExclamationTriangle, FaExclamationCircle, FaShieldAlt } from 'react-icons/fa';
 
 import 'katex/dist/katex.min.css';
-
-SyntaxHighlighter.registerLanguage('tsx', tsx);
-SyntaxHighlighter.registerLanguage('typescript', typescript);
-SyntaxHighlighter.registerLanguage('javascript', javascript);
-SyntaxHighlighter.registerLanguage('python', python);
-SyntaxHighlighter.registerLanguage('java', java);
-SyntaxHighlighter.registerLanguage('c', c);
-SyntaxHighlighter.registerLanguage('cpp', cpp);
-SyntaxHighlighter.registerLanguage('bash', bash);
-SyntaxHighlighter.registerLanguage('json', json);
-SyntaxHighlighter.registerLanguage('css', css);
-SyntaxHighlighter.registerLanguage('markdown', markdown);
 
 interface RichTextRendererProps {
     rawText: string | null | undefined;
@@ -124,7 +102,7 @@ const RichTextRenderer: React.FC<RichTextRendererProps> = React.memo(({ rawText,
         <div className={`preview-rich-text-content ${className || ''}`}>
             <ReactMarkdown
                 children={rawText}
-                remarkPlugins={[remarkMath, remarkGfm]}
+                remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
                 rehypePlugins={[
                     rehypeRaw,
                     rehypeSlug,
