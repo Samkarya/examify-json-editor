@@ -71,7 +71,7 @@ const RenderedImage: React.FC<{ src: string; alt?: string; [key: string]: any }>
     if (imageError || !src) {
         return <span className="text-danger small">[Image: {alt || 'not found'}]</span>;
     }
-    return <img src={src} alt={alt || ''} onError={() => setImageError(true)} className="img-fluid my-2" loading="lazy" style={{ maxWidth: '100%', height: 'auto', display: 'block' }} {...props} />;
+    return <img src={src} alt={alt || ''} onError={() => setImageError(true)} className="img-fluid my-2" loading="lazy" referrerPolicy="no-referrer" style={{ maxWidth: '100%', height: 'auto', display: 'block' }} {...props} />;
 };
 
 const CopyButton = ({ text }: { text: string }) => {
