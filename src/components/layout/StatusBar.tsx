@@ -41,7 +41,7 @@ const StatusBar: React.FC = () => {
             {/* Right Section: Context Info */}
             <div className="d-flex align-items-center gap-3">
                 <span>{activeMainView === 'json' ? 'JSON Mode' : 'Form Mode'}</span>
-                <span className="border-start ps-3">ExamOven Editor v1.0</span>
+                <span className="border-start ps-3">ExamOven Editor v1.0.1</span>
             </div>
         </div>
     );
