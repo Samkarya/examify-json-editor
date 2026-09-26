@@ -38,7 +38,7 @@
 }
 
 /* ═══════════════════════════════════════════════════
-   TABLE LAYOUT — enables repeating header/footer
+   TABLE LAYOUT - enables repeating header/footer
    The <table> structure with <thead>/<tfoot> is the
    only cross-browser way to repeat on every page.
    ═══════════════════════════════════════════════════ */
@@ -254,10 +254,11 @@
 }
 
 /* Clean up RichTextRenderer spacing */
-.print-q__text .preview-rich-text-content > :first-child {
+.print-q__text .preview-rich-text-content> :first-child {
     margin-top: 0;
 }
-.print-q__text .preview-rich-text-content > :last-child {
+
+.print-q__text .preview-rich-text-content> :last-child {
     margin-bottom: 0;
 }
 
@@ -364,12 +365,14 @@
     min-width: 0;
 }
 
-.print-option__value .preview-rich-text-content > :first-child {
+.print-option__value .preview-rich-text-content> :first-child {
     margin-top: 0;
 }
-.print-option__value .preview-rich-text-content > :last-child {
+
+.print-option__value .preview-rich-text-content> :last-child {
     margin-bottom: 0;
 }
+
 .print-option__value p {
     margin: 0;
 }
@@ -441,10 +444,11 @@
     color: var(--eo-text-secondary);
 }
 
-.print-q__explanation-body .preview-rich-text-content > :first-child {
+.print-q__explanation-body .preview-rich-text-content> :first-child {
     margin-top: 0;
 }
-.print-q__explanation-body .preview-rich-text-content > :last-child {
+
+.print-q__explanation-body .preview-rich-text-content> :last-child {
     margin-bottom: 0;
 }
 
@@ -465,7 +469,8 @@
         size: A4;
     }
 
-    html, body {
+    html,
+    body {
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -517,7 +522,8 @@
     }
 
     /* Code blocks */
-    pre, code {
+    pre,
+    code {
         font-size: 11px !important;
         break-inside: avoid;
     }

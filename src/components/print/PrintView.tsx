@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Question } from '../../types/Question';
 import '../../styles/print.css';
 import RichTextRenderer from '../common/RichTextRenderer';
@@ -41,7 +41,7 @@ const PrintView: React.FC = () => {
     return (
         <div className="print-page">
             <table className="print-layout-table">
-                {/* ═══ HEADER — repeated on every page ═══ */}
+                {/* ═══ HEADER - repeated on every page ═══ */}
                 <thead>
                     <tr>
                         <th>
@@ -76,7 +76,7 @@ const PrintView: React.FC = () => {
                     </tr>
                 </thead>
 
-                {/* ═══ FOOTER — repeated on every page ═══ */}
+                {/* ═══ FOOTER - repeated on every page ═══ */}
                 <tfoot>
                     <tr>
                         <td>
@@ -97,7 +97,7 @@ const PrintView: React.FC = () => {
                     </tr>
                 </tfoot>
 
-                {/* ═══ BODY — question content ═══ */}
+                {/* ═══ BODY - question content ═══ */}
                 <tbody>
                     <tr>
                         <td className="print-body-cell">
