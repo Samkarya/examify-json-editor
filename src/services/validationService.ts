@@ -1,270 +1,153 @@
 // src/services/validationService.ts
-import type { Question, QuestionsData, OptionMap } from '../types/Question';
+//
+// Thin adapter over the shared core (./examCore). The public API below is UNCHANGED
+// (ValidationError, validateQuestionsData, cleanJsonString, autoFixRawJsonString,
+// validateRawJsonString, formatValidationErrors) so existing callers keep working.
+// New, additive helpers (analyzeRawJson, autoFixRawJson) give the editor grouped problems,
+// click-to-jump positions, an LLM-ready prompt and a real auto-fix.
+import type { Question, QuestionsData } from '../types/Question';
+import { processExamItems, processExamText, buildLlmPrompt, locateQuestions, lineCol } from './examCore';
+import type { Issue, ExamReport, FixNote, IssueGroup } from './examCore';
 
 export interface ValidationError {
   questionId?: string; // Client-side ID if validating QuestionsData
-  questionNumber?: number | string; // User-defined question_number or index
+  questionNumber?: number | string; // User-defined question_number or "(item N)"
   field?: string; // Specific field that has an error
   message: string;
+  // ---- additive fields (older callers can ignore them) ----
+  code?: string; // stable machine-readable code, e.g. "E_ANSWER_NO_MATCH"
+  severity?: 'error' | 'warning' | 'info';
+  fix?: 'safe' | 'guess'; // can the auto-fix repair it? (safe = lossless, guess = heuristic)
+  line?: number; // 1-based, for click-to-jump
+  column?: number;
+  offset?: number;
 }
 
-const commonQuestionValidation = (
-    q: Partial<Omit<Question, 'id'>>,
-    index: number,
-    _allQuestionNumbers: Set<number>, // Used by validateQuestionsData to detect duplicates across questions
-    isRawJsonValidation: boolean = false // To slightly alter behavior for raw JSON vs structured data
-): ValidationError[] => {
-  const errors: ValidationError[] = [];
-  const qNumForError = q.question_number !== undefined ? q.question_number : `(at index ${index})`;
-
-  if (typeof q.question_number !== 'number' || !Number.isInteger(q.question_number) || q.question_number <= 0) {
-    errors.push({ questionNumber: qNumForError, field: 'question_number', message: "'question_number' must be a positive integer." });
+const toError = (i: Issue, ids?: Array<string | undefined>, offsets?: number[], text?: string): ValidationError => {
+  const e: ValidationError = {
+    questionId: i.index !== undefined && ids ? ids[i.index] : undefined,
+    questionNumber: i.questionNumber,
+    field: i.field,
+    message: i.message,
+    code: i.code,
+    severity: i.severity,
+    fix: i.fix === 'safe' || i.fix === 'guess' ? i.fix : undefined,
+    line: i.line,
+    column: i.column,
+    offset: i.offset,
+  };
+  if (e.offset === undefined && i.index !== undefined && offsets && offsets[i.index] !== undefined && text !== undefined) {
+    e.offset = offsets[i.index];
+    const lc = lineCol(text, e.offset);
+    e.line = lc.line;
+    e.column = lc.column;
   }
-  // Note: Cross-question duplicate q_number check is handled in validateQuestionsData and validateRawJsonString
-
-  if (typeof q.question_text !== 'string' || q.question_text.trim() === '') {
-    errors.push({ questionNumber: qNumForError, field: 'question_text', message: "'question_text' must be a non-empty string." });
-  }
-
-  // Validate options structure first
-  if (typeof q.options !== 'object' || q.options === null || Object.keys(q.options).length < 2) {
-    errors.push({ questionNumber: qNumForError, field: 'options', message: "'options' must be an object with at least two key-value pairs." });
-  } else {
-    // Option values and keys validation
-    for (const key in q.options) {
-      if (typeof (q.options as OptionMap)[key] !== 'string' || (q.options as OptionMap)[key].trim() === '') {
-        errors.push({ questionNumber: qNumForError, field: `options.${key}`, message: `Option '${key}' value must be a non-empty string.` });
-      }
-      if (key.trim() === '') {
-        errors.push({ questionNumber: qNumForError, field: 'options', message: 'Option keys cannot be empty.'});
-      }
-    }
-    const optionKeys = Object.keys(q.options);
-    if (new Set(optionKeys).size !== optionKeys.length) {
-        errors.push({ questionNumber: qNumForError, field: 'options', message: 'Option keys must be unique within a question.' });
-    }
-  }
-
-  // Validate correct_answer (works with or without valid options)
-  if (typeof q.correct_answer !== 'string' || q.correct_answer.trim() === '') {
-    errors.push({ questionNumber: qNumForError, field: 'correct_answer', message: "'correct_answer' must be a non-empty string." });
-  } else if (!q.options || typeof q.options !== 'object' || q.options === null) {
-    errors.push({ questionNumber: qNumForError, field: 'correct_answer', message: `'correct_answer' ("${q.correct_answer}") specified, but no valid 'options' object found.` });
-  } else {
-    // Check if any option key matches correct_answer case-insensitively
-    const optionKeys = Object.keys(q.options);
-    const optionKeysLower = optionKeys.map(k => k.toLowerCase());
-    const correctAnswerLower = q.correct_answer.toLowerCase();
-    
-    if (!optionKeysLower.includes(correctAnswerLower)) {
-      errors.push({
-        questionNumber: qNumForError,
-        field: 'correct_answer',
-        message: `'correct_answer' ("${q.correct_answer}") must match an existing option key (case-insensitive). Available options: ${optionKeys.join(', ')}.`
-      });
-    }
-  }
-
-  // Optional fields validation
-  if (q.hasOwnProperty('subject') && q.subject !== null && (typeof q.subject !== 'string' || q.subject.trim() === '')) {
-    errors.push({ questionNumber: qNumForError, field: 'subject', message: "'subject', if present and not null, must be a non-empty string." });
-  }
-  if (q.hasOwnProperty('topic') && q.topic !== null && (typeof q.topic !== 'string' || q.topic.trim() === '')) {
-    errors.push({ questionNumber: qNumForError, field: 'topic', message: "'topic', if present and not null, must be a non-empty string." });
-  }
-  if (q.hasOwnProperty('explanation') && q.explanation !== null && typeof q.explanation !== 'string') {
-    errors.push({ questionNumber: qNumForError, field: 'explanation', message: "'explanation', if present and not null, must be a string." });
-  }
-  if (q.hasOwnProperty('difficulty') && q.difficulty !== null && q.difficulty !== '' && !['Easy', 'Medium', 'Hard'].includes(q.difficulty!)) {
-    errors.push({ questionNumber: qNumForError, field: 'difficulty', message: "'difficulty', if present and not null, must be 'Easy', 'Medium', 'Hard', or an empty string." });
-  }
-  if (q.hasOwnProperty('section_id') && q.section_id !== null && (typeof q.section_id !== 'string' || q.section_id.trim() === '')) {
-    errors.push({ questionNumber: qNumForError, field: 'section_id', message: "'section_id', if present and not null, must be a non-empty string." });
-  }
-  
-  // Check for unknown keys
-  const allowedKeys = ['question_number', 'question_text', 'options', 'correct_answer', 'subject', 'topic', 'explanation', 'difficulty', 'section_id'];
-  // For raw JSON validation, we don't expect 'id' or '_isDirty'
-  const internalClientKeys = isRawJsonValidation ? [] : ['id', '_isDirty']; 
-  const allRecognizedKeys = [...allowedKeys, ...internalClientKeys];
-
-  for (const key in q) {
-      if (q.hasOwnProperty(key) && !allRecognizedKeys.includes(key) && !key.startsWith('_comment')) {
-          // MODIFICATION: Add as an error instead of console.warn
-          errors.push({ questionNumber: qNumForError, field: key, message: `Unrecognized field '${key}' found.` });
-      }
-  }
-
-  return errors;
+  return e;
 };
 
+/** Validates structured editor data. Returns ERRORS only (same contract as before). */
 export const validateQuestionsData = (questions: QuestionsData): ValidationError[] => {
-  const allErrors: ValidationError[] = [];
-  const questionNumbersEncountered = new Set<number>(); // For duplicate check
-  
-  // Create a sorted list for sequential check, but iterate original for error reporting context
-  const sortedQuestionsForSeqCheck = [...questions].sort((a,b) => (a.question_number || 0) - (b.question_number || 0));
-  let previousQNumberForSeqCheck = 0;
-  let nonSequentialErrorAdded = false; // Flag to add only one global non-sequential error
-
-  // Check for non-sequential numbers in the sorted list
-  for (let i = 0; i < sortedQuestionsForSeqCheck.length; i++) {
-    const qSorted = sortedQuestionsForSeqCheck[i];
-    if (qSorted.question_number) { // Only consider if question_number is valid type and present
-        // Check for gaps: e.g. 1, 2, 5 (gap after 2)
-        if (i > 0 && qSorted.question_number > previousQNumberForSeqCheck + 1 && !nonSequentialErrorAdded) {
-             // MODIFICATION: Add as a general error (not tied to a specific question)
-            allErrors.push({ message: `Question numbers are not strictly sequential (e.g., gap detected after Q#${previousQNumberForSeqCheck}). Please ensure numbers are consecutive.` });
-            nonSequentialErrorAdded = true; // Add this general error only once
-            break; // No need to check further for this specific type of non-sequential error
-        }
-        previousQNumberForSeqCheck = qSorted.question_number;
-    }
-  }
-
-
-  questions.forEach((q, index) => {
-    // For common validation, we don't pass the Set if we are validating raw JSON initially,
-    // as duplicate numbers across questions will be checked after all individual questions are parsed.
-    // However, for structured QuestionsData, we can perform the check.
-    const errors = commonQuestionValidation(q, index, questionNumbersEncountered, false);
-    errors.forEach(err => allErrors.push({ ...err, questionId: q.id }));
-
-    if (q.question_number && typeof q.question_number === 'number') {
-      if (questionNumbersEncountered.has(q.question_number)) {
-        allErrors.push({
-          questionId: q.id,
-          questionNumber: q.question_number,
-          field: 'question_number',
-          message: "'question_number' is duplicated. Must be unique across all questions.",
-        });
-      } else {
-        questionNumbersEncountered.add(q.question_number);
-      }
-    }
-  });
-
-  return allErrors;
+  const list = questions as unknown as Array<{ id?: string }>;
+  const report = processExamItems(list, { mode: 'check', clientKeys: ['id', '_isDirty'] });
+  const ids = list.map((q) => (q && typeof q === 'object' ? q.id : undefined));
+  return report.issues.filter((i) => i.severity === 'error').map((i) => toError(i, ids));
 };
 
+/** Strips ```json fences (any case / language tag) and surrounding commentary. */
 export const cleanJsonString = (rawString: string): string => {
-  let cleaned = rawString.trim();
-  if (cleaned.startsWith('```json')) cleaned = cleaned.substring(7);
-  else if (cleaned.startsWith('```')) cleaned = cleaned.substring(3);
-  if (cleaned.endsWith('```')) cleaned = cleaned.substring(0, cleaned.length - 3);
-  return cleaned.trim();
+  const trimmed = rawString.trim();
+  const fenced = /(?:```|~~~)[A-Za-z0-9_-]*[ \t]*\r?\n?([\s\S]*?)(?:```|~~~)/.exec(trimmed);
+  if (fenced && fenced[1].trim() !== '') return fenced[1].trim();
+  return trimmed.replace(/^(?:```|~~~)[A-Za-z0-9_-]*/, '').replace(/(?:```|~~~)$/, '').trim();
 };
 
+export interface AutoFixResult {
+  /** repaired JSON text (4-space indent, like before), or null when nothing could be read */
+  fixedJson: string | null;
+  error: string | null;
+  /** what was changed ("Renumbered questions", "Converted single quotes …") with safe/guess tiers */
+  fixes: FixNote[];
+  /** what is STILL wrong after the fix (needs a human or the AI) */
+  remaining: ValidationError[];
+  /** questions the fixer could not repair; they are kept exactly as written, never dropped */
+  unfixedCount: number;
+}
+
+/**
+ * Real auto-fix: syntax (quotes, commas, comments, truncation, several pasted lists, fences …),
+ * structure (field names, options list -> object, answer resolution, numbering) and content
+ * (LaTeX backslashes eaten by JSON, \( \) math, "$5 … $10" money, bare "<"). Never drops a question.
+ */
+export const autoFixRawJson = (text: string, opts: { applyGuess?: boolean } = {}): AutoFixResult => {
+  const report = processExamText(text, { mode: 'repair', applyGuess: opts.applyGuess !== false });
+  if (report.fatal) return { fixedJson: null, error: report.fatal.message, fixes: [], remaining: [], unfixedCount: 0 };
+  // nothing to fix and already valid JSON: hand back the user's own text, formatting untouched
+  const untouched = report.fixes.length === 0 && report.info.source === 'native';
+  const fixedJson = untouched ? text : JSON.stringify(report.repairedItems, null, 4);
+  const after = processExamText(fixedJson, { mode: 'check' });
+  return {
+    fixedJson,
+    error: null,
+    fixes: report.fixes,
+    remaining: after.issues.filter((i) => i.severity === 'error').map((i) => toError(i, undefined, locateQuestions(fixedJson), fixedJson)),
+    unfixedCount: report.skipped.length,
+  };
+};
+
+/** Old signature, kept. Now fixes far more than renumbering. */
 export const autoFixRawJsonString = (jsonString: string): { fixedJson: string | null; error: string | null } => {
-  const cleaned = cleanJsonString(jsonString);
-  try {
-    const data = JSON.parse(cleaned);
-    if (!Array.isArray(data)) {
-        return { fixedJson: null, error: "Top level must be an array." };
-    }
-    const fixedData = data.map((q: any, index: number) => {
-        if (typeof q === 'object' && q !== null) {
-            return { ...q, question_number: index + 1 };
-        }
-        return q;
-    });
-    return { fixedJson: JSON.stringify(fixedData, null, 4), error: null };
-  } catch (err: any) {
-    return { fixedJson: null, error: `Invalid JSON: ${err.message}` };
-  }
+  const r = autoFixRawJson(jsonString);
+  return { fixedJson: r.fixedJson, error: r.error };
 };
 
 export const validateRawJsonString = (
   jsonString: string
 ): { data: Omit<Question, 'id'>[] | null; errors: ValidationError[] } => {
-  const allErrors: ValidationError[] = [];
-  let parsedData: any = null;
-  const cleanedJsonString = cleanJsonString(jsonString);
-
-  if (cleanedJsonString.trim() === "") {
-    allErrors.push({ message: "JSON content cannot be empty. It should be an array, e.g., '[]'." });
-    return { data: null, errors: allErrors };
-  }
-
-  try {
-    parsedData = JSON.parse(cleanedJsonString);
-  } catch (err: any) {
-    allErrors.push({ message: `Invalid JSON syntax: ${err.message}. (Check for missing/extra commas, quotes, or brackets)` });
-    return { data: null, errors: allErrors };
-  }
-
-  if (!Array.isArray(parsedData)) {
-    allErrors.push({ message: "Invalid format: Top level of JSON must be an array of question objects." });
-    return { data: null, errors: allErrors };
-  }
-
-  const questionNumbersEncountered = new Set<number>(); // For duplicate check in raw JSON
-  let previousQNumberForSeqCheck = 0;
-  let nonSequentialErrorAdded = false; // Flag for raw JSON sequential check
-
-  // Sort parsed data by question_number for sequential check
-  const sortedParsedData = [...parsedData].sort((a, b) => (a.question_number || 0) - (b.question_number || 0));
-
-  for (let i = 0; i < sortedParsedData.length; i++) {
-    const qSorted = sortedParsedData[i];
-    if (qSorted.question_number && typeof qSorted.question_number === 'number') {
-      if (i > 0 && qSorted.question_number > previousQNumberForSeqCheck + 1 && !nonSequentialErrorAdded) {
-        // MODIFICATION: Add as a general error for raw JSON validation
-        allErrors.push({ message: `Question numbers in JSON are not strictly sequential (e.g., gap detected after Q#${previousQNumberForSeqCheck}). Please ensure numbers are consecutive.` });
-        nonSequentialErrorAdded = true;
-        break; 
-      }
-      previousQNumberForSeqCheck = qSorted.question_number;
-    }
-  }
-
-  parsedData.forEach((q: any, index: number) => {
-    // For common validation of raw JSON items, we pass an empty Set for `allQuestionNumbers` initially,
-    // because we handle duplicate checking for raw JSON after parsing all items.
-    const itemErrors = commonQuestionValidation(q, index, new Set(), true); 
-    itemErrors.forEach(err => allErrors.push(err));
-
-    // Duplicate q_number check specifically for raw JSON context
-    if (q.question_number && typeof q.question_number === 'number') {
-        if (questionNumbersEncountered.has(q.question_number)) {
-            allErrors.push({
-                questionNumber: q.question_number,
-                field: 'question_number',
-                message: `'question_number' is duplicated within the JSON. Must be unique. (Occurred at original index ${index})`,
-            });
-        } else {
-            questionNumbersEncountered.add(q.question_number);
-        }
-    }
-  });
-
-  if (allErrors.length > 0) {
-    return { data: null, errors: allErrors };
-  }
-
-  return { data: parsedData as Omit<Question, 'id'>[], errors: [] };
+  // an empty list is a valid starting point for the editor
+  if (/^\[\s*\]$/.test(cleanJsonString(jsonString))) return { data: [], errors: [] };
+  const report = processExamText(jsonString, { mode: 'check' });
+  const offsets = report.info.source === 'native' ? locateQuestions(jsonString) : undefined;
+  const errors = report.issues.filter((i) => i.severity === 'error').map((i) => toError(i, undefined, offsets, jsonString));
+  if (errors.length > 0) return { data: null, errors };
+  return { data: report.items as Omit<Question, 'id'>[], errors: [] };
 };
 
+export interface RawJsonAnalysis {
+  report: ExamReport;
+  errors: ValidationError[];
+  warnings: ValidationError[];
+  /** one row per root cause ("Q#1–Q#5000: missing options" is ONE row, not 5000) */
+  groups: IssueGroup[];
+  /** ready-to-paste prompt for the user's AI chat */
+  llmPrompt: string;
+}
+
+/** Everything the editor's "Validate" button needs, in one call. Nothing is modified. */
+export const analyzeRawJson = (text: string): RawJsonAnalysis => {
+  const report = processExamText(text, { mode: 'check' });
+  const offsets = report.info.source === 'native' ? locateQuestions(text) : undefined;
+  const all = report.issues.map((i) => toError(i, undefined, offsets, text));
+  return {
+    report,
+    errors: all.filter((e) => e.severity === 'error'),
+    warnings: all.filter((e) => e.severity !== 'error'),
+    groups: report.groups,
+    llmPrompt: buildLlmPrompt(report, text),
+  };
+};
 
 export const formatValidationErrors = (errors: ValidationError[]): string[] => {
-    return errors.map(err => {
-        let prefix = '';
-        // If it's a general message not tied to a question number (like sequential error)
-        if (err.questionNumber === undefined && err.field === undefined && err.questionId === undefined) {
-            return err.message;
-        }
-
-        if (err.questionNumber !== undefined) {
-            prefix += `Q#${err.questionNumber}`;
-        } else if (err.questionId) {
-            // Could fetch the question from store to get its number if needed for display,
-            // but for now, client ID might be too technical for user. Let's stick to qNum.
-            // Or, if it's a general error from validateQuestionsData not tied to a specific question
-        }
-
-        if (err.field) {
-            prefix += ` (Field: ${err.field})`;
-        }
-        return `${prefix ? prefix + ': ' : ''}${err.message}`;
-    });
+  return errors.map((err) => {
+    // general message not tied to a question (syntax, numbering …)
+    if (err.questionNumber === undefined && err.field === undefined && err.questionId === undefined) {
+      return err.line !== undefined && !/line \d+/i.test(err.message) ? `Line ${err.line}: ${err.message}` : err.message;
+    }
+    let prefix = '';
+    if (err.questionNumber !== undefined) {
+      const qn = String(err.questionNumber);
+      prefix += /^\(item \d+\)$/.test(qn) ? qn.replace(/[()]/g, '').replace(/^./, (c) => c.toUpperCase()) : `Q#${qn}`;
+    }
+    if (err.field) prefix += ` (Field: ${err.field})`;
+    return `${prefix ? prefix + ': ' : ''}${err.message}`;
+  });
 };
