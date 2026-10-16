@@ -625,7 +625,7 @@ function extractSlow(raw: string, book: Book, deadline: number): Extracted {
     book.merge(shape);
     for (const x of sk) skipped.push(x);
     if (items.length > 0) { arrays++; for (const x of items) merged.push(x); } else emptyArrays++;
-    if (Array.isArray(out.value) || isObj(out.value) && !looksLikeQuestion(out.value)) lists++;
+    if (Array.isArray(out.value) || (isObj(out.value) && !looksLikeQuestion(out.value))) lists++;
     ranges.push([idx, out.end]);
     if (out.eof) truncated = true;
     pos = Math.max(out.end, idx + 1);
@@ -805,7 +805,7 @@ function findCurrency(s: string): Array<{ open: number; close: number; text: str
     if (/[\\^_{}]/.test(content)) continue;
     // money looks like words between the amounts, or a bare number with an operator ("$5.00 + $2.00")
     const words = content.match(/[A-Za-z]{3,}/g);
-    const bareSum = /^[ \t]?[\d.,]+[\d\s.,+\-×*\/()=x:;]*$/.test(content);
+    const bareSum = /^[ \t]?[\d.,]+[\d\s.,+\-×*/()=x:;]*$/.test(content);
     const hasProse = words !== null && words.length >= 1;
     if (!bareSum && !hasProse) continue;
     out.push({ open: sp.start, close: sp.end - 1, text: m.slice(sp.start, Math.min(sp.end + 4, sp.start + 40)) });
@@ -1056,8 +1056,14 @@ function applyTextRules(s: string, field: string, emit: Emit): string {
     const detail = r.test(before);
     if (detail === null) continue;
     const fix = r.fix;
-    if (fix) emit(r.code, r.severity, field, r.msg(detail, field), r.tier, () => { cur = fix(before); });
-    else emit(r.code, r.severity, field, r.msg(detail, field), 'none');
+    if (fix) {
+      let applied = before;
+      const applyFix = (): void => { applied = fix(before); };
+      const accepted = emit(r.code, r.severity, field, r.msg(detail, field), r.tier, applyFix);
+      if (accepted) cur = applied;
+    } else {
+      emit(r.code, r.severity, field, r.msg(detail, field), 'none');
+    }
   }
   return cur;
 }
