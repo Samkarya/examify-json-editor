@@ -1,5 +1,5 @@
 /**
- * examCore.ts — shared exam JSON reader / repairer / validator.
+ * examCore.ts - shared exam JSON reader / repairer / validator.
  *
  * ONE source of truth for the bank CLI (validate.ts), the editor (validationService.ts)
  * and the import worker.  Pure TypeScript, no runtime dependencies (only ./renderSupport data),
@@ -470,7 +470,7 @@ function forgivingParse(s: string, start: number, book: Book, skipped: SkipRec[]
         const v = value();
         if (v !== PLACEHOLDER) {
           if (eof && isObj(v)) {
-            skipped.push({ ordinal, offset: elemStart, pos: i, kind: 'CUT_OFF', message: 'This question was cut off — the text ended before it was complete' });
+            skipped.push({ ordinal, offset: elemStart, pos: i, kind: 'CUT_OFF', message: 'This question was cut off - the text ended before it was complete' });
             break;
           }
           a.push(v);
@@ -915,10 +915,10 @@ const RULES: TextRule[] = [
         const d = h.word === '' ? `a ${h.ch === '\f' ? 'form-feed' : 'backspace'} character` : `${DMG[h.ch].name} before "${h.word}" (was \\${BACK[h.ch]}${h.word}?)`;
         if (uniq.indexOf(d) < 0) uniq.push(d);
       }
-      return uniq.slice(0, 3).join('; ') + (hits.length > 1 ? ` — ${hits.length} places in this text` : '');
+      return uniq.slice(0, 3).join('; ') + (hits.length > 1 ? ` - ${hits.length} places in this text` : '');
     },
     fix: (s) => applyEdits(s, findDamage(s).map((h) => ({ start: h.pos, end: h.pos + 1, text: '\\' + BACK[h.ch] }))),
-    msg: (d, f) => `${f}: a LaTeX backslash was eaten by JSON — ${d}. In JSON every LaTeX backslash must be written twice (\\\\times).`,
+    msg: (d, f) => `${f}: a LaTeX backslash was eaten by JSON - ${d}. In JSON every LaTeX backslash must be written twice (\\\\times).`,
   },
   {
     code: 'W_AI_ARTIFACT', severity: 'warning', tier: 'safe',
@@ -1019,7 +1019,7 @@ const RULES: TextRule[] = [
   {
     code: 'W_HTML_EXECUTE', severity: 'warning', tier: 'none',
     test: (s) => (s.indexOf('html-execute') >= 0 && /(^|\n)\s*(```|~~~)\s*html-execute\b/.test(s) ? 'html-execute' : null),
-    msg: (_d, f) => `${f}: contains an html-execute block — HTML/JavaScript that runs inside a sandboxed frame. Review it.`,
+    msg: (_d, f) => `${f}: contains an html-execute block - HTML/JavaScript that runs inside a sandboxed frame. Review it.`,
   },
   {
     code: 'W_UNCLOSED_FENCE', severity: 'warning', tier: 'none',
@@ -1613,7 +1613,7 @@ export function processExamText(raw: string, opts: ProcessOptions = {}): ExamRep
   const t0 = now();
   const ro = resolveOpts(opts);
   const text = typeof raw === 'string' ? raw : String(raw ?? '');
-  if (text.trim() === '') return fatalReport(t0, text, 'E_EMPTY', 'Nothing to check — the text is empty. Paste the exam JSON, which should start with [');
+  if (text.trim() === '') return fatalReport(t0, text, 'E_EMPTY', 'Nothing to check - the text is empty. Paste the exam JSON, which should start with [');
   if (text.length > ro.maxBytes) return fatalReport(t0, text, 'E_TOO_BIG', `The text is ${(text.length / 1048576).toFixed(1)} MB; the limit is ${(ro.maxBytes / 1048576).toFixed(0)} MB.`);
 
   const book = new Book();
@@ -1647,7 +1647,7 @@ export function processExamText(raw: string, opts: ProcessOptions = {}): ExamRep
     }
   }
   if (items.length > ro.maxQuestions) return fatalReport(t0, text, 'E_TOO_MANY', `${items.length} questions found; the limit is ${ro.maxQuestions}.`);
-  if (items.length === 0 && skippedParse.length === 0) return fatalReport(t0, text, 'E_NO_QUESTIONS', 'The list is empty — it contains no questions.');
+  if (items.length === 0 && skippedParse.length === 0) return fatalReport(t0, text, 'E_NO_QUESTIONS', 'The list is empty - it contains no questions.');
 
   const issues: Issue[] = [];
   const contentBook = new Book();
@@ -1671,7 +1671,7 @@ export function processExamText(raw: string, opts: ProcessOptions = {}): ExamRep
     issues.push({ code: 'E_UNREADABLE_ITEM', severity: 'error', message, line: lc.line, column: lc.column, offset: sk.offset });
     skipped.push({ line: lc.line, reason: message });
   }
-  if (truncated) issues.push({ code: 'S_TRUNCATED', severity: 'warning', message: 'The text looks cut off — the end of the exam may be missing. Ask the AI to continue and paste the rest.' });
+  if (truncated) issues.push({ code: 'S_TRUNCATED', severity: 'warning', message: 'The text looks cut off - the end of the exam may be missing. Ask the AI to continue and paste the rest.' });
 
   const merged = new Book();
   merged.merge(syntaxBook);
@@ -1760,7 +1760,7 @@ const FORMAT_RULES =
 /** A ready-to-paste prompt a non-technical user can give to their AI. */
 export function buildLlmPrompt(report: ExamReport, rawText?: string): string {
   const lines: string[] = [];
-  lines.push('My exam JSON failed to import. Fix ONLY the problems listed below and return the complete corrected JSON array — no explanations and no markdown code fences.');
+  lines.push('My exam JSON failed to import. Fix ONLY the problems listed below and return the complete corrected JSON array - no explanations and no markdown code fences.');
   lines.push('');
   const errs = report.groups.filter((g) => g.severity === 'error');
   const list = (errs.length ? errs : report.groups).slice(0, 15);

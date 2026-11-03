@@ -1,5 +1,5 @@
 /**
- * renderSupport.ts — SINGLE SOURCE OF TRUTH for the exam renderer's rules.
+ * renderSupport.ts - SINGLE SOURCE OF TRUTH for the exam renderer's rules.
  * Pure data + three tiny pure helpers, no imports.  Used by:
  *   - MarkdownRenderer.tsx  (builds its rehype-sanitize schema from this)
  *   - examCore.ts           (lints content against exactly what the renderer will keep)
@@ -119,20 +119,28 @@ export function parseCodeLanguage(className?: string): string | null {
  * attributes alone, so arrowheads (marker-end) and gradient fills would point at nothing.
  * Run this AFTER sanitising: it rewrites those references to the prefixed id. Mutates the hast tree.
  */
+/** Minimal structural view of a HAST node — only the fields prefixSvgUrlRefs reads/writes. */
+interface HastNode {
+  type?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+}
 export function prefixSvgUrlRefs(tree: unknown): void {
-  const visit = (node: any): void => {
-    if (node && node.type === 'element' && node.properties) {
+  const visit = (node: HastNode): void => {
+    if (node.type === 'element' && node.properties) {
       for (const key of URL_REF_ATTRS) {
         const v = node.properties[key];
         if (typeof v === 'string') {
           const m = /^url\(\s*#([^)\s]+)\s*\)$/.exec(v.trim());
-          if (m && m[1].indexOf(CLOBBER_PREFIX) !== 0) node.properties[key] = 'url(#' + CLOBBER_PREFIX + m[1] + ')';
+          if (m && m[1].indexOf(CLOBBER_PREFIX) !== 0) {
+            node.properties[key] = 'url(#' + CLOBBER_PREFIX + m[1] + ')';
+          }
         }
       }
     }
-    if (node && Array.isArray(node.children)) for (const c of node.children) visit(c);
+    if (Array.isArray(node.children)) for (const c of node.children) visit(c);
   };
-  visit(tree);
+  visit(tree as HastNode);
 }
 
 /**
